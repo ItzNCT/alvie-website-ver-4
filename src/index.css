@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Layout */
+    --nav-width: 64px;
+    --nav-width-expanded: 280px;
+    --safe-space: 48px;
+
+    /* ALVIE Brand Colors */
+    --alvie-green: #0F5C4E;
+    --alvie-gold: #D49A5A;
+    --alvie-white: #F7F4EB;
+    --alvie-black: #1A1A18;
+
+    /* Typography */
+    --font-display: 'Baloo 2', cursive;
+    --font-body: 'Be Vietnam Pro', sans-serif;
+
+    /* Shadcn tokens mapped to ALVIE palette */
+    --background: 43 33% 95%;
+    --foreground: 60 6% 10%;
+
+    --card: 43 33% 95%;
+    --card-foreground: 60 6% 10%;
+
+    --popover: 43 33% 95%;
+    --popover-foreground: 60 6% 10%;
+
+    --primary: 166 72% 21%;
+    --primary-foreground: 43 33% 95%;
+
+    --secondary: 30 55% 59%;
+    --secondary-foreground: 43 33% 95%;
+
+    --muted: 43 20% 88%;
+    --muted-foreground: 60 3% 40%;
+
+    --accent: 30 55% 59%;
+    --accent-foreground: 43 33% 95%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 43 33% 95%;
+
+    --border: 43 15% 82%;
+    --input: 43 15% 82%;
+    --ring: 166 72% 21%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 43 33% 95%;
+    --sidebar-foreground: 60 6% 10%;
+    --sidebar-primary: 166 72% 21%;
+    --sidebar-primary-foreground: 43 33% 95%;
+    --sidebar-accent: 43 20% 88%;
+    --sidebar-accent-foreground: 60 6% 10%;
+    --sidebar-border: 43 15% 82%;
+    --sidebar-ring: 166 72% 21%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--alvie-black);
+    background-color: var(--alvie-white);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--alvie-green);
+    line-height: 1.2;
+  }
+}
+
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hero-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-line-scale {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes nav-fade-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Mini-TOC active states */
+.mini-toc-row {
+  color: rgba(247, 244, 235, 0.45);
+  transition: color 300ms ease;
+  cursor: pointer;
+}
+.mini-toc-row .numeral {
+  color: rgba(212, 154, 90, 0.35);
+  transition: color 300ms ease;
+}
+.mini-toc-row:hover {
+  color: rgba(247, 244, 235, 0.7);
+}
+.mini-toc-row.active {
+  color: rgba(247, 244, 235, 0.85);
+}
+.mini-toc-row.active .numeral {
+  color: rgba(212, 154, 90, 0.7);
+}
+.mini-toc-row.light-mode {
+  color: rgba(26, 26, 24, 0.35);
+}
+.mini-toc-row.light-mode .numeral {
+  color: rgba(212, 154, 90, 0.5);
+}
+.mini-toc-row.light-mode:hover {
+  color: rgba(26, 26, 24, 0.55);
+}
+.mini-toc-row.light-mode.active {
+  color: rgba(26, 26, 24, 0.7);
+}
+.mini-toc-row.light-mode.active .numeral {
+  color: rgba(212, 154, 90, 0.8);
+}
+
+/* Radar sweep rotation */
+.radar-sweep {
+  transform-origin: 250px 250px;
+  animation: radar-rotate 8s linear infinite;
+}
+
+@keyframes radar-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+@keyframes clover-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+/* ProcessTimeline icon animations */
+@keyframes pt-scan {
+  0%, 100% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+}
+@keyframes pt-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pt-draw {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3px, -3px); }
+}
+@keyframes pt-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes pt-desc-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pt-wm-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Photo treatment for ALVIE aesthetic cohesion */
+.alvie-photo {
+  filter: saturate(0.85) contrast(1.05) sepia(0.08);
+  transition: filter 300ms ease;
+}
+
+/* Photo reveal on scroll — subtle zoom settle */
+.alvie-photo-reveal {
+  clip-path: inset(0);
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
