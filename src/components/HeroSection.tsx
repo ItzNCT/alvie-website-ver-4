@@ -98,11 +98,8 @@ const HeroSection = () => {
         className="relative"
         style={{
           zIndex: 4,
-          marginLeft: "var(--nav-width, 64px)",
-          width: "calc(100vw - var(--nav-width, 64px))",
-          paddingLeft: "var(--safe-space, 48px)",
-          paddingRight: "var(--safe-space, 48px)",
-          transition: "margin-left 400ms cubic-bezier(0.4,0,0.2,1), width 400ms cubic-bezier(0.4,0,0.2,1)",
+          paddingLeft: 48,
+          paddingRight: 48,
         }}
       >
         <HeroContent />
