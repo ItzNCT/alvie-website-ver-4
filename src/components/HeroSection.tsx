@@ -3,7 +3,6 @@ import HeroContent from "./HeroContent";
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let ctx: any;
@@ -17,21 +16,6 @@ const HeroSection = () => {
       if (!section) return;
 
       ctx = gsap.context(() => {
-        // Hero text fades out faster (first 30vh)
-        if (contentRef.current) {
-          gsap.to(contentRef.current, {
-            opacity: 0,
-            y: -40,
-            scrollTrigger: {
-              trigger: ".page-wrapper",
-              start: "top top",
-              end: "30vh top",
-              scrub: true,
-            },
-          });
-        }
-
-        // Entire hero section fades out over first 50vh
         gsap.to(section, {
           opacity: 0,
           scrollTrigger: {
@@ -60,7 +44,7 @@ const HeroSection = () => {
       className="fixed inset-0 w-screen h-screen overflow-hidden hero-section"
       style={{ zIndex: 30 }}
     >
-      {/* z-1: Video background */}
+      {/* Video background */}
       <div
         className="absolute inset-0 animate-hero-fade-in hero-video-wrapper"
         style={{ zIndex: 1 }}
@@ -76,32 +60,8 @@ const HeroSection = () => {
         </video>
       </div>
 
-      {/* z-2: Dark overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "rgba(26, 26, 24, 0.40)", zIndex: 2 }}
-      />
-
-      {/* z-3: Vignette overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, transparent 40%, rgba(247, 244, 235, 0.15) 100%)",
-          zIndex: 3,
-        }}
-      />
-
-      {/* z-4: Content — uses elastic layout */}
-      <div
-        ref={contentRef}
-        className="relative"
-        style={{
-          zIndex: 4,
-          paddingLeft: 48,
-          paddingRight: 48,
-        }}
-      >
+      {/* Content layer with integrated vignette */}
+      <div className="absolute inset-0" style={{ zIndex: 2 }}>
         <HeroContent />
       </div>
     </div>
