@@ -20,7 +20,7 @@ const TABS = [
   },
 ];
 
-const TRANSITION = { duration: 0.7, ease: [0.4, 0, 0.2, 1] };
+const TRANSITION = { duration: 0.7, ease: [0.4, 0, 0.2, 1] as const };
 
 /* ═══════════════════════════════════════════════
    Vignette 1 – The Hesitation (typing address bar)

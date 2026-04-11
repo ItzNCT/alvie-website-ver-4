@@ -2,6 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import ScrollytellingUnified from "@/components/ScrollytellingUnified";
 import ScrollytellingTextOverlay from "@/components/ScrollytellingTextOverlay";
 import ScrollytellingFreezeFrame from "@/components/ScrollytellingFreezeFrame";
+import ProblemSection from "@/components/ProblemSection";
 
 const Index = () => {
   return (
@@ -10,6 +11,7 @@ const Index = () => {
       <ScrollytellingUnified />
       <ScrollytellingTextOverlay />
       <ScrollytellingFreezeFrame />
+      <ProblemSection />
     </div>
   );
 };
