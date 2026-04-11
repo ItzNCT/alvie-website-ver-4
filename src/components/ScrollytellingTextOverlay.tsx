@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 
 const STATEMENT =
-  "ALVIE bridge the trust gap create by the disconnection of real-world expertise and digital reputation to display founder's true value to the audience.";
+  "We turn real-world expertise into digital experiences that earn trust - through strategy, research and digital solutions. All built from scratch.";
 
 const ScrollytellingTextOverlay = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,10 +23,10 @@ const ScrollytellingTextOverlay = () => {
       ctx = gsap.context(() => {
         const wordEls = gsap.utils.toArray<HTMLElement>(".st-word");
 
-        /* Phase 1: Word-by-word reveal (5–35% of track — faster) */
+        /* Phase 1: Word-by-word reveal (0–40% ≈ frames 0-80) */
         wordEls.forEach((el, i) => {
-          const startP = 5 + (i / wordEls.length) * 30;
-          const endP = startP + 2.5;
+          const startP = (i / wordEls.length) * 38;
+          const endP = startP + 3;
           gsap.fromTo(
             el,
             { y: 40, opacity: 0 },
@@ -44,7 +44,7 @@ const ScrollytellingTextOverlay = () => {
           );
         });
 
-        /* Phase 1: Vignette dimming (5–35%) */
+        /* Phase 1: Vignette dimming (0–40%) */
         if (filterRef.current) {
           gsap.fromTo(
             filterRef.current,
@@ -53,26 +53,7 @@ const ScrollytellingTextOverlay = () => {
               opacity: 1,
               scrollTrigger: {
                 trigger: track,
-                start: "5% top",
-                end: "35% top",
-                scrub: 0.5,
-              },
-            }
-          );
-        }
-
-        /* Explanation fade-in (33–40%) */
-        if (bottomRef.current) {
-          gsap.fromTo(
-            bottomRef.current,
-            { opacity: 0, y: 24 },
-            {
-              opacity: 1,
-              y: 0,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: track,
-                start: "33% top",
+                start: "0% top",
                 end: "40% top",
                 scrub: 0.5,
               },
@@ -80,14 +61,33 @@ const ScrollytellingTextOverlay = () => {
           );
         }
 
-        /* Phase 2: Global fade-out — container + filter (42–65%) */
+        /* Phase 2: Bottom part fade-in all at once (40–55% ≈ frames 80-110) */
+        if (bottomRef.current) {
+          gsap.fromTo(
+            bottomRef.current,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1,
+              y: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: track,
+                start: "40% top",
+                end: "55% top",
+                scrub: 0.5,
+              },
+            }
+          );
+        }
+
+        /* Phase 3: Global fade-out (90–100% ≈ frames 180+) */
         if (containerRef.current) {
           gsap.to(containerRef.current, {
             opacity: 0,
             scrollTrigger: {
               trigger: track,
-              start: "42% top",
-              end: "65% top",
+              start: "90% top",
+              end: "100% top",
               scrub: 0.5,
             },
           });
@@ -98,8 +98,8 @@ const ScrollytellingTextOverlay = () => {
             opacity: 0,
             scrollTrigger: {
               trigger: track,
-              start: "42% top",
-              end: "65% top",
+              start: "90% top",
+              end: "100% top",
               scrub: 0.5,
             },
           });
@@ -166,7 +166,7 @@ const ScrollytellingTextOverlay = () => {
                   color: "#F9FAFB",
                 }}
               >
-                The Hesitation
+                Not just exist.
               </h3>
             </div>
 
@@ -178,11 +178,9 @@ const ScrollytellingTextOverlay = () => {
                   color: "rgba(249, 250, 251, 0.8)",
                 }}
               >
-                You've probably noticed this before. The hesitation to share your
-                website or business materials. Because you know that your digital
-                platforms don't accurately represent the quality of your
-                operations. If you recognize this inconsistency, the market
-                observes it as well.
+                Every project begins with deep research into how your business
+                actually operates. No templates. No shortcuts. Just dedicated
+                craft shaped entirely around your story. Explore our work ↗
               </p>
             </div>
           </div>
