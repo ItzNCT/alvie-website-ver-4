@@ -23,13 +23,13 @@ const ScrollytellingTextOverlay = () => {
       ctx = gsap.context(() => {
         const wordEls = gsap.utils.toArray<HTMLElement>(".st-word");
 
-        /* Phase 1: Word-by-word reveal (0–40% of track) */
+        /* Phase 1: Word-by-word reveal (5–35% of track — faster) */
         wordEls.forEach((el, i) => {
-          const startP = 5 + (i / wordEls.length) * 35;
-          const endP = startP + 3;
+          const startP = 5 + (i / wordEls.length) * 30;
+          const endP = startP + 2.5;
           gsap.fromTo(
             el,
-            { y: 50, opacity: 0 },
+            { y: 40, opacity: 0 },
             {
               y: 0,
               opacity: 1,
@@ -44,7 +44,7 @@ const ScrollytellingTextOverlay = () => {
           );
         });
 
-        /* Phase 1: Filter dimming (0–40%) */
+        /* Phase 1: Vignette dimming (5–35%) */
         if (filterRef.current) {
           gsap.fromTo(
             filterRef.current,
@@ -54,6 +54,25 @@ const ScrollytellingTextOverlay = () => {
               scrollTrigger: {
                 trigger: track,
                 start: "5% top",
+                end: "35% top",
+                scrub: 0.5,
+              },
+            }
+          );
+        }
+
+        /* Explanation fade-in (33–40%) */
+        if (bottomRef.current) {
+          gsap.fromTo(
+            bottomRef.current,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: track,
+                start: "33% top",
                 end: "40% top",
                 scrub: 0.5,
               },
@@ -61,33 +80,26 @@ const ScrollytellingTextOverlay = () => {
           );
         }
 
-        /* Phase 1 end: Explanation fade-in (38–45%) */
-        if (bottomRef.current) {
-          gsap.fromTo(
-            bottomRef.current,
-            { opacity: 0, y: 30 },
-            {
-              opacity: 1,
-              y: 0,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: track,
-                start: "38% top",
-                end: "45% top",
-                scrub: 0.5,
-              },
-            }
-          );
-        }
-
-        /* Phase 2: Global fade-out (50–70%) */
+        /* Phase 2: Global fade-out — container + filter (42–65%) */
         if (containerRef.current) {
           gsap.to(containerRef.current, {
             opacity: 0,
             scrollTrigger: {
               trigger: track,
-              start: "50% top",
-              end: "70% top",
+              start: "42% top",
+              end: "65% top",
+              scrub: 0.5,
+            },
+          });
+        }
+
+        if (filterRef.current) {
+          gsap.to(filterRef.current, {
+            opacity: 0,
+            scrollTrigger: {
+              trigger: track,
+              start: "42% top",
+              end: "65% top",
               scrub: 0.5,
             },
           });
@@ -100,88 +112,83 @@ const ScrollytellingTextOverlay = () => {
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 pointer-events-none flex items-center justify-center"
-      style={{ zIndex: 10 }}
-    >
-      {/* ─── Cinematic Filter ─── */}
+    <>
+      {/* ─── Immersive Vignette Filter ─── */}
       <div
         ref={filterRef}
-        className="absolute inset-0"
+        className="fixed inset-0 pointer-events-none"
         style={{
+          zIndex: 9,
           background:
-            "radial-gradient(circle at center, rgba(0,0,0,0.65) 0%, transparent 65%)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          maskImage:
-            "radial-gradient(circle at center, black 30%, transparent 70%)",
-          WebkitMaskImage:
-            "radial-gradient(circle at center, black 30%, transparent 70%)",
+            "radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(18,18,18,0.85) 100%)",
           opacity: 0,
         }}
       />
 
       {/* ─── Text Container ─── */}
-      <div className="max-w-5xl w-full mx-auto px-6 text-left relative" style={{ zIndex: 2 }}>
-        {/* Top Part: Large Statement */}
-        <h2
-          className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "#F9FAFB",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {words.map((word, i) => (
-            <span
-              key={i}
-              className="st-word inline-block mr-[0.3em]"
-              style={{ opacity: 0 }}
-            >
-              {word}
-            </span>
-          ))}
-        </h2>
+      <div
+        ref={containerRef}
+        className="fixed inset-0 pointer-events-none flex flex-col justify-center w-full"
+        style={{ zIndex: 10 }}
+      >
+        <div className="w-full max-w-7xl mx-auto px-8 md:px-16 text-left">
+          {/* Top Part: Large Statement */}
+          <h2
+            className="text-4xl md:text-5xl lg:text-[4rem] font-extrabold leading-[1.1] mb-20"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "#F9FAFB",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {words.map((word, i) => (
+              <span
+                key={i}
+                className="st-word inline-block mr-[0.3em]"
+                style={{ opacity: 0 }}
+              >
+                {word}
+              </span>
+            ))}
+          </h2>
 
-        {/* Bottom Part: Explanation Grid */}
-        <div
-          ref={bottomRef}
-          className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-8"
-          style={{ opacity: 0 }}
-        >
-          {/* Left Column */}
-          <div className="md:col-span-4">
-            <h3
-              className="text-lg font-semibold"
-              style={{
-                fontFamily: "var(--font-body)",
-                color: "#F9FAFB",
-              }}
-            >
-              The Hesitation
-            </h3>
-          </div>
+          {/* Bottom Part: Explanation Grid */}
+          <div
+            ref={bottomRef}
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16"
+            style={{ opacity: 0 }}
+          >
+            <div className="md:col-span-4">
+              <h3
+                className="text-lg md:text-xl font-semibold leading-relaxed"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  color: "#F9FAFB",
+                }}
+              >
+                The Hesitation
+              </h3>
+            </div>
 
-          {/* Right Column */}
-          <div className="md:col-span-8">
-            <p
-              className="text-lg font-light leading-relaxed"
-              style={{
-                fontFamily: "var(--font-body)",
-                color: "rgba(249, 250, 251, 0.8)",
-              }}
-            >
-              You've probably noticed this before. The hesitation to share your
-              website or business materials. Because you know that your digital
-              platforms don't accurately represent the quality of your
-              operations. If you recognize this inconsistency, the market
-              observes it as well.
-            </p>
+            <div className="md:col-span-8">
+              <p
+                className="text-lg md:text-xl font-light leading-relaxed"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  color: "rgba(249, 250, 251, 0.8)",
+                }}
+              >
+                You've probably noticed this before. The hesitation to share your
+                website or business materials. Because you know that your digital
+                platforms don't accurately represent the quality of your
+                operations. If you recognize this inconsistency, the market
+                observes it as well.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
