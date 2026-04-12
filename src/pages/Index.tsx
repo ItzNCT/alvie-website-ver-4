@@ -1,6 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import ScrollytellingUnified from "@/components/ScrollytellingUnified";
-import ScrollytellingTextOverlay from "@/components/ScrollytellingTextOverlay";
+
 import ScrollytellingFreezeFrame from "@/components/ScrollytellingFreezeFrame";
 
 const Index = () => {
@@ -8,7 +8,6 @@ const Index = () => {
     <div className="min-h-screen page-wrapper">
       <HeroSection />
       <ScrollytellingUnified />
-      <ScrollytellingTextOverlay />
       <ScrollytellingFreezeFrame />
     </div>
   );
