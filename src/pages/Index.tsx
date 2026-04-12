@@ -8,7 +8,6 @@ const Index = () => {
     <div className="min-h-screen page-wrapper">
       <HeroSection />
       <ScrollytellingUnified />
-      <ScrollytellingTextOverlay />
       <ScrollytellingFreezeFrame />
     </div>
   );
