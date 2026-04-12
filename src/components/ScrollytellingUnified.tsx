@@ -7,76 +7,102 @@ const SUPABASE_BASE =
   "https://uwzjmdrwqizokkxjnlpv.supabase.co/storage/v1/object/public/frames-lovable/intro1";
 const TOTAL_FRAMES = 200;
 
-/* ── Word-by-word staggered text ── */
-const WordReveal = ({
+/* ── Scroll-driven word block ── */
+const ScrollWords = ({
   text,
-  isVisible,
-  className,
+  frameIndex,
+  enterStart,
+  enterEnd,
+  exitStart,
+  exitEnd,
+  staggerStep = 3,
 }: {
   text: string;
-  isVisible: boolean;
-  className?: string;
+  frameIndex: ReturnType<typeof useTransform<number, number>>;
+  enterStart: number;
+  enterEnd: number;
+  exitStart?: number;
+  exitEnd?: number;
+  staggerStep?: number;
 }) => {
-  const words = text.split(/\s+/);
+  const words = text.split(" ");
   return (
-    <span className={className}>
+    <span className="absolute flex flex-wrap items-center justify-center gap-x-[0.3em] w-full">
       {words.map((word, i) => (
-        <motion.span
-          key={i}
-          className="inline-block mr-[0.3em]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{
-            duration: 0.5,
-            delay: isVisible ? i * 0.06 : 0,
-            ease: [0.4, 0, 0.2, 1],
-          }}
-        >
-          {word}
-        </motion.span>
+        <ScrollWord
+          key={`${word}-${i}`}
+          word={word}
+          index={i}
+          frameIndex={frameIndex}
+          enterStart={enterStart}
+          enterEnd={enterEnd}
+          exitStart={exitStart}
+          exitEnd={exitEnd}
+          staggerStep={staggerStep}
+        />
       ))}
     </span>
   );
 };
 
-/* ── Center text block with blur transitions ── */
-const CenterText = ({
-  text,
-  state,
+const ScrollWord = ({
+  word,
+  index,
+  frameIndex,
+  enterStart,
+  enterEnd,
+  exitStart,
+  exitEnd,
+  staggerStep,
 }: {
-  text: string;
-  state: "entering" | "visible" | "exiting" | "hidden";
+  word: string;
+  index: number;
+  frameIndex: ReturnType<typeof useTransform<number, number>>;
+  enterStart: number;
+  enterEnd: number;
+  exitStart?: number;
+  exitEnd?: number;
+  staggerStep: number;
 }) => {
-  const variants = {
-    hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-    entering: { opacity: 1, y: 0, filter: "blur(0px)" },
-    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
-    exiting: { opacity: 0, y: -40, filter: "blur(10px)" },
-  };
+  const wordEnterStart = enterStart + index * staggerStep;
+  const wordEnterEnd = Math.min(wordEnterStart + (enterEnd - enterStart) * 0.6, enterEnd);
+
+  const enterOpacity = useTransform(frameIndex, [wordEnterStart, wordEnterEnd], [0, 1], { clamp: true });
+  const enterY = useTransform(frameIndex, [wordEnterStart, wordEnterEnd], [40, 0], { clamp: true });
+
+  let exitOpacity: ReturnType<typeof useTransform<number, number>> | undefined;
+  let exitY: ReturnType<typeof useTransform<number, number>> | undefined;
+
+  if (exitStart !== undefined && exitEnd !== undefined) {
+    const wordExitStart = exitStart + index * staggerStep;
+    const wordExitEnd = Math.min(wordExitStart + (exitEnd - exitStart) * 0.6, exitEnd);
+    exitOpacity = useTransform(frameIndex, [wordExitStart, wordExitEnd], [1, 0], { clamp: true });
+    exitY = useTransform(frameIndex, [wordExitStart, wordExitEnd], [0, -40], { clamp: true });
+  }
+
+  // Combine enter and exit: if we have exit transforms, multiply/add them
+  const combinedOpacity = exitOpacity
+    ? useTransform([enterOpacity, exitOpacity] as any, ([eIn, eOut]: number[]) => eIn * eOut)
+    : enterOpacity;
+
+  const combinedY = exitY
+    ? useTransform([enterY, exitY] as any, ([yIn, yOut]: number[]) => yIn + yOut)
+    : enterY;
 
   return (
-    <motion.h2
-      className="absolute text-5xl md:text-7xl font-extrabold leading-[1.1] max-w-5xl"
+    <motion.span
+      className="inline-block"
       style={{
-        fontFamily: "var(--font-display)",
-        color: "#F9FAFB",
-        letterSpacing: "-0.02em",
-        textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+        opacity: combinedOpacity,
+        y: combinedY,
       }}
-      initial="hidden"
-      animate={state}
-      variants={variants}
-      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
     >
-      {state === "entering" || state === "visible" ? (
-        <WordReveal text={text} isVisible={true} />
-      ) : (
-        text
-      )}
-    </motion.h2>
+      {word}
+    </motion.span>
   );
 };
 
+/* ── Main component ── */
 const ScrollytellingUnified = () => {
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -87,9 +113,7 @@ const ScrollytellingUnified = () => {
 
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [currentFrame, setCurrentFrame] = useState(0);
 
-  /* ── Scroll tracking ── */
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -97,9 +121,13 @@ const ScrollytellingUnified = () => {
 
   const frameIndex = useTransform(scrollYProgress, [0, 1], [0, TOTAL_FRAMES - 1]);
 
+  /* ── Bottom content: scroll-driven ── */
+  const bottomOpacity = useTransform(frameIndex, [0, 40, 60], [0, 0, 1], { clamp: true });
+  const bottomY = useTransform(frameIndex, [0, 40, 60], [20, 20, 0], { clamp: true });
+
+  /* ── Draw frame on canvas ── */
   useMotionValueEvent(frameIndex, "change", (latest) => {
     const frame = Math.round(latest);
-    setCurrentFrame(frame);
     if (loaded && frame !== currentFrameRef.current) {
       currentFrameRef.current = frame;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -107,37 +135,6 @@ const ScrollytellingUnified = () => {
     }
   });
 
-  /* ── Derive animation states from frame ── */
-  const text1State: "entering" | "visible" | "exiting" | "hidden" =
-    currentFrame < 5
-      ? "entering"
-      : currentFrame <= 70
-      ? "visible"
-      : currentFrame <= 85
-      ? "exiting"
-      : "hidden";
-
-  const text2State: "entering" | "visible" | "exiting" | "hidden" =
-    currentFrame < 80
-      ? "hidden"
-      : currentFrame <= 85
-      ? "entering"
-      : currentFrame <= 140
-      ? "visible"
-      : currentFrame <= 155
-      ? "exiting"
-      : "hidden";
-
-  const text3State: "entering" | "visible" | "exiting" | "hidden" =
-    currentFrame < 150
-      ? "hidden"
-      : currentFrame <= 155
-      ? "entering"
-      : "visible";
-
-  const bottomVisible = currentFrame >= 50;
-
-  /* ── Draw frame ── */
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -224,18 +221,18 @@ const ScrollytellingUnified = () => {
       className="relative"
       style={{ height: isMobile ? "400vh" : "600vh" }}
     >
-      {/* ── Sticky viewport ── */}
+      {/* Sticky viewport */}
       <div className="sticky top-0 w-screen h-screen overflow-hidden bg-black">
-        {/* Z-0: Canvas background */}
+        {/* Z-0: Canvas */}
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full"
           style={{ zIndex: 0 }}
           role="img"
-          aria-label="Cinematic transition showing Hoi An from street level rising to an aerial rooftop view, then transitioning to sketch illustration"
+          aria-label="Cinematic transition showing Hoi An from street level rising to an aerial rooftop view"
         />
 
-        {/* Poster frame while loading */}
+        {/* Poster while loading */}
         {!loaded && (
           <img
             src={`${SUPABASE_BASE}/frame_0001.webp`}
@@ -246,7 +243,7 @@ const ScrollytellingUnified = () => {
           />
         )}
 
-        {/* Dark vignette overlay */}
+        {/* Vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -256,59 +253,84 @@ const ScrollytellingUnified = () => {
           }}
         />
 
-        {/* ── Z-10: Text overlay layer ── */}
+        {/* Z-10: Overlay */}
         <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ zIndex: 10 }}
+          className="absolute inset-0 z-10 w-full h-full flex flex-col px-6 md:px-12 pb-12 pt-32 pointer-events-none"
         >
-          {/* Center text container */}
-          <div className="absolute inset-0 flex items-center justify-center text-center px-6">
-            <CenterText
-              text="We see what others overlook."
-              state={text1State}
-            />
-            <CenterText
-              text="To refine the unpolished pieces."
-              state={text2State}
-            />
-            <CenterText
-              text="Into a living digital presence."
-              state={text3State}
-            />
-          </div>
+          <div className="max-w-[1200px] mx-auto w-full h-full flex flex-col justify-between relative">
+            {/* Center text wrapper */}
+            <div
+              className="absolute inset-0 flex items-center justify-center text-center"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "#F9FAFB",
+                letterSpacing: "-0.02em",
+                textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+              }}
+            >
+              <div className="text-5xl md:text-7xl font-extrabold leading-[1.1] max-w-5xl relative w-full flex items-center justify-center min-h-[1.2em]">
+                {/* Text 1: enter 0-40, exit 80-100 */}
+                <ScrollWords
+                  text="We see what others overlook."
+                  frameIndex={frameIndex}
+                  enterStart={0}
+                  enterEnd={40}
+                  exitStart={80}
+                  exitEnd={100}
+                />
+                {/* Text 2: enter 100-130, exit 150-170 */}
+                <ScrollWords
+                  text="To refine the unpolished pieces."
+                  frameIndex={frameIndex}
+                  enterStart={100}
+                  enterEnd={130}
+                  exitStart={150}
+                  exitEnd={170}
+                />
+                {/* Text 3: enter 170-195, no exit */}
+                <ScrollWords
+                  text="Into a living digital presence."
+                  frameIndex={frameIndex}
+                  enterStart={170}
+                  enterEnd={195}
+                />
+              </div>
+            </div>
 
-          {/* Bottom text container */}
-          <motion.div
-            className="absolute bottom-10 left-10 right-10 flex justify-between items-end"
-            initial={{ opacity: 0, y: 20 }}
-            animate={bottomVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <p
-              className="text-sm uppercase tracking-widest max-w-[200px]"
+            {/* Bottom content */}
+            <motion.div
+              className="w-full flex justify-between items-end mt-auto"
               style={{
-                fontFamily: "var(--font-body)",
-                color: "rgba(249, 250, 251, 0.9)",
+                opacity: bottomOpacity,
+                y: bottomY,
               }}
             >
-              To Not Just Exist
-            </p>
-            <p
-              className="text-sm uppercase tracking-widest max-w-[400px] text-left"
-              style={{
-                fontFamily: "var(--font-body)",
-                color: "rgba(249, 250, 251, 0.9)",
-              }}
-            >
-              We turn real world expertise into digital experiences that earn
-              trust — through strategy, research and digital solutions
-            </p>
-          </motion.div>
+              <p
+                className="text-sm uppercase tracking-widest max-w-[200px]"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  color: "rgba(249, 250, 251, 0.9)",
+                }}
+              >
+                To Not Just Exist
+              </p>
+              <p
+                className="text-sm max-w-[400px] text-left"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  color: "rgba(249, 250, 251, 0.8)",
+                }}
+              >
+                We turn real world expertise into digital experiences that earn
+                trust — through strategy, research and digital solutions
+              </p>
+            </motion.div>
+          </div>
         </div>
 
-        {/* Scroll progress line (desktop) */}
+        {/* Scroll progress indicator (desktop) */}
         {!isMobile && (
-          <div
+          <motion.div
             className="absolute"
             style={{
               right: 24,
@@ -320,15 +342,14 @@ const ScrollytellingUnified = () => {
               zIndex: 20,
             }}
           >
-            <div
+            <motion.div
+              className="w-full"
               style={{
-                width: "100%",
-                height: `${(currentFrame / (TOTAL_FRAMES - 1)) * 100}%`,
+                height: useTransform(frameIndex, [0, TOTAL_FRAMES - 1], ["0%", "100%"]),
                 background: "rgba(212, 154, 90, 0.4)",
-                transition: "height 0.1s linear",
               }}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Loading progress */}
