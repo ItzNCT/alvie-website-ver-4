@@ -1,10 +1,81 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Progress } from "@/components/ui/progress";
 
 const SUPABASE_BASE =
   "https://uwzjmdrwqizokkxjnlpv.supabase.co/storage/v1/object/public/frames-lovable/intro1";
 const TOTAL_FRAMES = 200;
+
+/* ── Word-by-word staggered text ── */
+const WordReveal = ({
+  text,
+  isVisible,
+  className,
+}: {
+  text: string;
+  isVisible: boolean;
+  className?: string;
+}) => {
+  const words = text.split(/\s+/);
+  return (
+    <span className={className}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          className="inline-block mr-[0.3em]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{
+            duration: 0.5,
+            delay: isVisible ? i * 0.06 : 0,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
+
+/* ── Center text block with blur transitions ── */
+const CenterText = ({
+  text,
+  state,
+}: {
+  text: string;
+  state: "entering" | "visible" | "exiting" | "hidden";
+}) => {
+  const variants = {
+    hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+    entering: { opacity: 1, y: 0, filter: "blur(0px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+    exiting: { opacity: 0, y: -40, filter: "blur(10px)" },
+  };
+
+  return (
+    <motion.h2
+      className="absolute text-5xl md:text-7xl font-extrabold leading-[1.1] max-w-5xl"
+      style={{
+        fontFamily: "var(--font-display)",
+        color: "#F9FAFB",
+        letterSpacing: "-0.02em",
+        textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+      }}
+      initial="hidden"
+      animate={state}
+      variants={variants}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+    >
+      {state === "entering" || state === "visible" ? (
+        <WordReveal text={text} isVisible={true} />
+      ) : (
+        text
+      )}
+    </motion.h2>
+  );
+};
 
 const ScrollytellingUnified = () => {
   const isMobile = useIsMobile();
@@ -13,22 +84,58 @@ const ScrollytellingUnified = () => {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(0);
   const rafRef = useRef<number | null>(null);
-  const progressFillRef = useRef<HTMLDivElement>(null);
 
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState(0);
 
-  const scrollHeight = isMobile ? "550vh" : "850vh";
+  /* ── Scroll tracking ── */
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
 
-  /* ── Reduced motion ── */
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
-    const h = () => setPrefersReducedMotion(mq.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
+  const frameIndex = useTransform(scrollYProgress, [0, 1], [0, TOTAL_FRAMES - 1]);
+
+  useMotionValueEvent(frameIndex, "change", (latest) => {
+    const frame = Math.round(latest);
+    setCurrentFrame(frame);
+    if (loaded && frame !== currentFrameRef.current) {
+      currentFrameRef.current = frame;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => drawFrame(frame));
+    }
+  });
+
+  /* ── Derive animation states from frame ── */
+  const text1State: "entering" | "visible" | "exiting" | "hidden" =
+    currentFrame < 5
+      ? "entering"
+      : currentFrame <= 70
+      ? "visible"
+      : currentFrame <= 85
+      ? "exiting"
+      : "hidden";
+
+  const text2State: "entering" | "visible" | "exiting" | "hidden" =
+    currentFrame < 80
+      ? "hidden"
+      : currentFrame <= 85
+      ? "entering"
+      : currentFrame <= 140
+      ? "visible"
+      : currentFrame <= 155
+      ? "exiting"
+      : "hidden";
+
+  const text3State: "entering" | "visible" | "exiting" | "hidden" =
+    currentFrame < 150
+      ? "hidden"
+      : currentFrame <= 155
+      ? "entering"
+      : "visible";
+
+  const bottomVisible = currentFrame >= 50;
 
   /* ── Draw frame ── */
   const drawFrame = useCallback((index: number) => {
@@ -110,77 +217,25 @@ const ScrollytellingUnified = () => {
     imagesRef.current = images;
   }, [drawFrame]);
 
-  /* ── GSAP frame scrubbing + progress ── */
-  useEffect(() => {
-    if (!loaded || prefersReducedMotion) return;
-
-    let ctx: any;
-
-    const initGSAP = async () => {
-      const { gsap } = await import("gsap");
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
-
-      const container = containerRef.current;
-      if (!container) return;
-
-      ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: container,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.3,
-          onUpdate: (self) => {
-            const frameIndex = Math.min(
-              Math.floor(self.progress * (TOTAL_FRAMES - 1)),
-              TOTAL_FRAMES - 1
-            );
-            if (frameIndex !== currentFrameRef.current) {
-              currentFrameRef.current = frameIndex;
-              if (rafRef.current) cancelAnimationFrame(rafRef.current);
-              rafRef.current = requestAnimationFrame(() => drawFrame(frameIndex));
-            }
-            if (progressFillRef.current) {
-              progressFillRef.current.style.height = `${self.progress * 100}%`;
-            }
-          },
-        });
-      }, container);
-    };
-
-    initGSAP();
-
-    return () => {
-      ctx?.revert();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [loaded, prefersReducedMotion, drawFrame]);
-
-  /* ── Reduced motion fallback ── */
-  useEffect(() => {
-    if (prefersReducedMotion && loaded) {
-      drawFrame(TOTAL_FRAMES - 1);
-    }
-  }, [prefersReducedMotion, loaded, drawFrame]);
-
   return (
     <section
       id="section-introduction"
       ref={containerRef}
-      className="relative scrollytelling-track"
-      style={{ height: scrollHeight }}
+      className="relative"
+      style={{ height: isMobile ? "400vh" : "600vh" }}
     >
-      <div
-        className="sticky top-0 w-screen h-screen overflow-hidden"
-        style={{ zIndex: 10 }}
-      >
+      {/* ── Sticky viewport ── */}
+      <div className="sticky top-0 w-screen h-screen overflow-hidden bg-black">
+        {/* Z-0: Canvas background */}
         <canvas
           ref={canvasRef}
-          className="w-full h-full"
+          className="absolute inset-0 w-full h-full"
+          style={{ zIndex: 0 }}
           role="img"
           aria-label="Cinematic transition showing Hoi An from street level rising to an aerial rooftop view, then transitioning to sketch illustration"
         />
 
+        {/* Poster frame while loading */}
         {!loaded && (
           <img
             src={`${SUPABASE_BASE}/frame_0001.webp`}
@@ -191,20 +246,65 @@ const ScrollytellingUnified = () => {
           />
         )}
 
-        {/* Dark overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "rgba(26, 26, 24, 0.40)", zIndex: 2 }}
-        />
-
-        {/* Vignette */}
+        {/* Dark vignette overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(247, 244, 235, 0.12) 100%)",
-            zIndex: 3,
+            background:
+              "radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.6) 100%)",
+            zIndex: 1,
           }}
         />
+
+        {/* ── Z-10: Text overlay layer ── */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ zIndex: 10 }}
+        >
+          {/* Center text container */}
+          <div className="absolute inset-0 flex items-center justify-center text-center px-6">
+            <CenterText
+              text="We see what others overlook."
+              state={text1State}
+            />
+            <CenterText
+              text="To refine the unpolished pieces."
+              state={text2State}
+            />
+            <CenterText
+              text="Into a living digital presence."
+              state={text3State}
+            />
+          </div>
+
+          {/* Bottom text container */}
+          <motion.div
+            className="absolute bottom-10 left-10 right-10 flex justify-between items-end"
+            initial={{ opacity: 0, y: 20 }}
+            animate={bottomVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <p
+              className="text-sm uppercase tracking-widest max-w-[200px]"
+              style={{
+                fontFamily: "var(--font-body)",
+                color: "rgba(249, 250, 251, 0.9)",
+              }}
+            >
+              To Not Just Exist
+            </p>
+            <p
+              className="text-sm uppercase tracking-widest max-w-[400px] text-left"
+              style={{
+                fontFamily: "var(--font-body)",
+                color: "rgba(249, 250, 251, 0.9)",
+              }}
+            >
+              We turn real world expertise into digital experiences that earn
+              trust — through strategy, research and digital solutions
+            </p>
+          </motion.div>
+        </div>
 
         {/* Scroll progress line (desktop) */}
         {!isMobile && (
@@ -217,15 +317,15 @@ const ScrollytellingUnified = () => {
               width: 1,
               height: 60,
               background: "rgba(247, 244, 235, 0.1)",
-              zIndex: 10,
+              zIndex: 20,
             }}
           >
             <div
-              ref={progressFillRef}
               style={{
                 width: "100%",
-                height: "0%",
+                height: `${(currentFrame / (TOTAL_FRAMES - 1)) * 100}%`,
                 background: "rgba(212, 154, 90, 0.4)",
+                transition: "height 0.1s linear",
               }}
             />
           </div>
@@ -234,7 +334,10 @@ const ScrollytellingUnified = () => {
         {/* Loading progress */}
         {!loaded && (
           <div className="absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-500">
-            <Progress value={loadProgress} className="h-0.5 rounded-none bg-transparent" />
+            <Progress
+              value={loadProgress}
+              className="h-0.5 rounded-none bg-transparent"
+            />
           </div>
         )}
       </div>
