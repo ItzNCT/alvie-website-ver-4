@@ -25,22 +25,34 @@ const ScrollWords = ({
   exitEnd?: number;
   staggerStep?: number;
 }) => {
-  const words = text.split(" ");
+  const lines = text.split("\n");
+  let wordIndex = 0;
   return (
-    <span className="absolute flex flex-wrap items-center justify-center gap-x-[0.3em] w-full">
-      {words.map((word, i) => (
-        <ScrollWord
-          key={`${word}-${i}`}
-          word={word}
-          index={i}
-          frameIndex={frameIndex}
-          enterStart={enterStart}
-          enterEnd={enterEnd}
-          exitStart={exitStart}
-          exitEnd={exitEnd}
-          staggerStep={staggerStep}
-        />
-      ))}
+    <span className="absolute flex flex-col items-center justify-center gap-y-[0.05em] w-full">
+      {lines.map((line, lineIdx) => {
+        const lineWords = line.split(" ");
+        const lineEl = (
+          <span key={lineIdx} className="flex flex-wrap items-center justify-center gap-x-[0.3em]">
+            {lineWords.map((word, wi) => {
+              const idx = wordIndex++;
+              return (
+                <ScrollWord
+                  key={`${word}-${idx}`}
+                  word={word}
+                  index={idx}
+                  frameIndex={frameIndex}
+                  enterStart={enterStart}
+                  enterEnd={enterEnd}
+                  exitStart={exitStart}
+                  exitEnd={exitEnd}
+                  staggerStep={staggerStep}
+                />
+              );
+            })}
+          </span>
+        );
+        return lineEl;
+      })}
     </span>
   );
 };
@@ -255,9 +267,9 @@ const ScrollytellingUnified = () => {
 
         {/* Z-10: Overlay */}
         <div
-          className="absolute inset-0 z-10 w-full h-full flex flex-col px-6 md:px-12 pb-12 pt-32 pointer-events-none"
+          className="absolute inset-0 z-10 w-full h-full flex flex-col px-6 md:px-12 pointer-events-none"
         >
-          <div className="max-w-[1200px] mx-auto w-full h-full flex flex-col justify-between relative">
+          <div className="max-w-[1200px] mx-auto w-full h-full flex flex-col justify-end relative pb-10 md:pb-14">
             {/* Center text wrapper */}
             <div
               className="absolute inset-0 flex items-center justify-center text-center"
@@ -266,12 +278,13 @@ const ScrollytellingUnified = () => {
                 color: "#F9FAFB",
                 letterSpacing: "-0.02em",
                 textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+                paddingBottom: "10vh",
               }}
             >
-              <div className="text-5xl md:text-7xl font-extrabold leading-[1.1] max-w-5xl relative w-full flex items-center justify-center min-h-[1.2em]">
+              <div className="text-5xl md:text-7xl font-extrabold leading-[1.1] max-w-5xl relative w-full flex items-center justify-center min-h-[2.4em]">
                 {/* Text 1: enter 0-40, exit 80-100 */}
                 <ScrollWords
-                  text="We see what others overlook."
+                  text={"We see what\nothers overlook."}
                   frameIndex={frameIndex}
                   enterStart={0}
                   enterEnd={40}
@@ -280,7 +293,7 @@ const ScrollytellingUnified = () => {
                 />
                 {/* Text 2: enter 100-130, exit 150-170 */}
                 <ScrollWords
-                  text="To refine the unpolished pieces."
+                  text={"To refine\nunpolished pieces."}
                   frameIndex={frameIndex}
                   enterStart={100}
                   enterEnd={130}
@@ -289,7 +302,7 @@ const ScrollytellingUnified = () => {
                 />
                 {/* Text 3: enter 170-195, no exit */}
                 <ScrollWords
-                  text="Into a living digital presence."
+                  text={"Into a living\ndigital presence."}
                   frameIndex={frameIndex}
                   enterStart={170}
                   enterEnd={195}
@@ -299,14 +312,14 @@ const ScrollytellingUnified = () => {
 
             {/* Bottom content */}
             <motion.div
-              className="w-full flex justify-between items-end mt-auto"
+              className="w-full flex justify-between items-start"
               style={{
                 opacity: bottomOpacity,
                 y: bottomY,
               }}
             >
               <p
-                className="text-sm uppercase tracking-widest max-w-[200px]"
+                className="text-sm uppercase tracking-widest max-w-[200px] font-bold"
                 style={{
                   fontFamily: "var(--font-body)",
                   color: "rgba(249, 250, 251, 0.9)",
