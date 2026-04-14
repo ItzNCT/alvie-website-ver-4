@@ -239,7 +239,7 @@ const ScrollytellingUnified = () => {
       id="section-introduction"
       ref={containerRef}
       className="relative"
-      style={{ height: isMobile ? "400vh" : "600vh" }}
+      style={{ height: isMobile ? "500vh" : "700vh" }}
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 w-screen h-screen overflow-hidden bg-black">
@@ -273,9 +273,10 @@ const ScrollytellingUnified = () => {
           }}
         />
 
-        {/* Z-10: Overlay */}
-        <div
+        {/* Z-10: Overlay — fades out during linger zone */}
+        <motion.div
           className="absolute inset-0 z-10 w-full h-full flex flex-col px-6 md:px-12 pointer-events-none"
+          style={{ opacity: lingerFadeOpacity }}
         >
           <div className="max-w-[1200px] mx-auto w-full h-full flex flex-col justify-end relative pb-10 md:pb-14">
             {/* Center text wrapper */}
@@ -347,7 +348,7 @@ const ScrollytellingUnified = () => {
               </p>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Scroll progress indicator (desktop) */}
         {!isMobile && (
@@ -372,6 +373,17 @@ const ScrollytellingUnified = () => {
             />
           </motion.div>
         )}
+
+        {/* Bottom glow — appears during last 50vh */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: "30%",
+            zIndex: 15,
+            background: "linear-gradient(to top, rgba(249,250,251,0.2) 0%, transparent 60%)",
+            opacity: glowOpacity,
+          }}
+        />
 
         {/* Loading progress */}
         {!loaded && (
