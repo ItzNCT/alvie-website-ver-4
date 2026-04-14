@@ -85,13 +85,13 @@ const ParallaxBreath = ({
     <section
       ref={sectionRef}
       className="relative w-screen overflow-hidden"
-      style={{ height: isMobile ? "50vh" : "70vh" }}
+      style={{ height: isMobile ? "45vh" : "70vh" }}
     >
       {/* Parallax image */}
       <img
         ref={imageRef}
         src={imageSrc}
-        alt=""
+        alt="A dimly lit doorway revealing a warm artisan workspace — the beauty within, partially hidden"
         className="alvie-photo absolute inset-0 w-full object-cover pointer-events-none"
         style={{ height: "120%" }}
       />
@@ -116,11 +116,11 @@ const ParallaxBreath = ({
       <div
         className="absolute z-[2]"
         style={{
-          bottom: isMobile ? 40 : 64,
+          bottom: isMobile ? 32 : 64,
           left: isMobile ? 24 : 48,
           fontFamily: "var(--font-display)",
           fontWeight: 700,
-          fontSize: "clamp(24px, 3vw, 40px)",
+          fontSize: isMobile ? 22 : "clamp(24px, 3vw, 40px)",
           color: "#F9FAFB",
           lineHeight: 1.2,
           letterSpacing: "-0.02em",

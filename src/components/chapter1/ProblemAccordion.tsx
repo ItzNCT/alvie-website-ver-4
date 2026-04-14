@@ -51,6 +51,7 @@ const ProblemAccordionItem = ({
   reducedMotion: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -75,6 +76,15 @@ const ProblemAccordionItem = ({
         transition: { duration: 0.5, delay: entranceDelay, ease },
       };
 
+  /* Compute colors based on open + hover state */
+  const numberOpacity = isOpen ? 0.8 : isHovered ? 0.6 : 0.4;
+  const titleOpacity = isOpen ? 1 : isHovered ? 0.8 : 0.55;
+  const iconColor = isOpen
+    ? "rgba(15, 92, 78, 0.8)"
+    : isHovered
+      ? "rgba(107, 114, 128, 0.6)"
+      : "rgba(107, 114, 128, 0.4)";
+
   return (
     <motion.div {...entranceProps}>
       <AccordionPrimitive.Item
@@ -94,17 +104,25 @@ const ProblemAccordionItem = ({
           }}
         />
 
-        <AccordionPrimitive.Trigger className="flex items-center w-full text-left cursor-pointer py-7 group">
+        <AccordionPrimitive.Trigger
+          className="flex items-center w-full text-left cursor-pointer py-6 lg:py-7 group rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F5C4E]"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
+            backgroundColor: !isOpen && isHovered ? "rgba(15, 92, 78, 0.03)" : "transparent",
+            transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
           {/* Number */}
           <span
             className="shrink-0"
             style={{
-              width: 44,
+              width: 36,
               fontFamily: "var(--font-body)",
               fontWeight: 400,
-              fontSize: 14,
-              color: isOpen ? "rgba(15, 92, 78, 0.8)" : "rgba(15, 92, 78, 0.4)",
-              transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+              fontSize: "clamp(13px, 0.9vw, 14px)",
+              color: `rgba(15, 92, 78, ${numberOpacity})`,
+              transition: "color 200ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             {item.number}
@@ -116,9 +134,9 @@ const ProblemAccordionItem = ({
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 500,
-              fontSize: 18,
-              color: isOpen ? "rgba(17, 24, 39, 1)" : "rgba(17, 24, 39, 0.55)",
-              transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+              fontSize: "clamp(16px, 1.1vw, 18px)",
+              color: `rgba(17, 24, 39, ${titleOpacity})`,
+              transition: "color 200ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             {item.title}
@@ -134,9 +152,9 @@ const ProblemAccordionItem = ({
               style={{
                 width: 16,
                 height: 1.5,
-                backgroundColor: isOpen ? "rgba(15, 92, 78, 0.8)" : "rgba(107, 114, 128, 0.4)",
+                backgroundColor: iconColor,
                 transform: `translate(-50%, -50%) rotate(${isOpen ? "45deg" : "0deg"})`,
-                transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms",
+                transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms",
               }}
             />
             <span
@@ -144,9 +162,9 @@ const ProblemAccordionItem = ({
               style={{
                 width: 16,
                 height: 1.5,
-                backgroundColor: isOpen ? "rgba(15, 92, 78, 0.8)" : "rgba(107, 114, 128, 0.4)",
+                backgroundColor: iconColor,
                 transform: `translate(-50%, -50%) rotate(${isOpen ? "-45deg" : "90deg"})`,
-                transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms",
+                transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms",
               }}
             />
           </div>
@@ -165,7 +183,7 @@ const ProblemAccordionItem = ({
             <div
               className="pb-7"
               style={{
-                paddingLeft: 44,
+                paddingLeft: 36,
                 maxWidth: 480,
                 opacity: isOpen ? 1 : 0,
                 transform: isOpen ? "translateY(0)" : "translateY(8px)",
@@ -181,7 +199,7 @@ const ProblemAccordionItem = ({
                   style={{
                     fontFamily: "var(--font-body)",
                     fontWeight: 300,
-                    fontSize: 16,
+                    fontSize: "clamp(15px, 1vw, 16px)",
                     lineHeight: 1.75,
                     color: "#6B7280",
                   }}
