@@ -38,7 +38,7 @@ const PARAGRAPHS = [
   "The good news: nothing about your actual work needs to change. Your expertise, your values, your track record—they're already there. They just need to be seen. What needs to change is how the digital world experiences who you really are.",
 ];
 
-const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 /* ── Stat Card 1: Glassmorphism over image ── */
 const StatFrame1 = () => {
@@ -61,7 +61,7 @@ const StatFrame1 = () => {
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: EASE }}
+          transition={{ duration: 0.8, ease: EASE as any }}
           className="rounded-xl p-6 md:p-8"
           style={{
             background: "rgba(255,255,255,0.12)",
@@ -118,7 +118,7 @@ const StatFrame2 = () => {
       <motion.div
         initial={{ opacity: 0, y: 32 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 1, ease: EASE }}
+        transition={{ duration: 1, ease: EASE as any }}
       >
         <span
           className="font-display block"
@@ -227,7 +227,7 @@ const TrustGapSection = () => {
             className="font-display"
             initial={{ opacity: 0, y: 32 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.9, ease: EASE }}
+            transition={{ duration: 0.9, ease: EASE as any }}
             style={{
               fontSize: "clamp(28px, 4vw, 52px)",
               fontWeight: 700,
@@ -306,7 +306,7 @@ const TrustGapSection = () => {
                     }}
                     transition={{
                       duration: 0.6,
-                      ease: EASE,
+                      ease: EASE as any,
                     }}
                     style={{
                       fontSize: "clamp(15px, 1.2vw, 17px)",
