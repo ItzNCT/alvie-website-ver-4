@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import useReducedMotion from "@/hooks/useReducedMotion";
 import ChapterOverline from "./ChapterOverline";
 import ProblemAccordion from "./ProblemAccordion";
 import ParallaxBreath from "./ParallaxBreath";
@@ -20,7 +22,31 @@ const accordionItems = [
   },
 ];
 
+const ease = [0.4, 0, 0.2, 1] as const;
+
 const Chapter1 = () => {
+  const reduced = useReducedMotion();
+
+  const fade = (delay: number, duration = 0.5, y = 16) =>
+    reduced
+      ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
+      : {
+          initial: { opacity: 0, y },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, amount: 0.2 },
+          transition: { duration, delay, ease },
+        };
+
+  const scaleFade = (delay: number, duration = 0.8) =>
+    reduced
+      ? { initial: { scaleY: 1 }, animate: { scaleY: 1 } }
+      : {
+          initial: { scaleY: 0 },
+          whileInView: { scaleY: 1 },
+          viewport: { once: true, amount: 0.2 },
+          transition: { duration, delay, ease },
+        };
+
   return (
     <section
       className="relative z-[2]"
@@ -35,7 +61,9 @@ const Chapter1 = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_6fr] gap-x-16">
           {/* Left column */}
           <div className="lg:sticky lg:top-[calc(50vh-120px)] lg:self-start mb-12 lg:mb-0">
-            <ChapterOverline number="01" label="The Trust Gap" />
+            <motion.div {...fade(0, 0.4, 12)}>
+              <ChapterOverline number="01" label="The Trust Gap" />
+            </motion.div>
 
             <h2
               className="mt-6"
@@ -47,29 +75,30 @@ const Chapter1 = () => {
                 letterSpacing: "-0.025em",
               }}
             >
-              <span style={{ color: "#111827" }} className="block">
+              <motion.span {...fade(0.15, 0.5)} style={{ color: "#111827" }} className="block">
                 You've built something remarkable.
-              </span>
-              <span style={{ color: "#6B7280" }} className="block">
+              </motion.span>
+              <motion.span {...fade(0.3, 0.5)} style={{ color: "#6B7280" }} className="block">
                 But online, no one can tell.
-              </span>
+              </motion.span>
             </h2>
 
             {/* Decorative line */}
-            <div
+            <motion.div
               className="mt-8 hidden lg:block"
               style={{
                 width: 1.5,
                 height: 64,
-                background:
-                  "linear-gradient(to bottom, rgba(15, 92, 78, 0.25), transparent)",
+                background: "linear-gradient(to bottom, rgba(15, 92, 78, 0.25), transparent)",
+                transformOrigin: "top",
               }}
+              {...scaleFade(0.6)}
             />
           </div>
 
           {/* Right column */}
           <div>
-            <p
+            <motion.p
               className="mb-12"
               style={{
                 fontFamily: "var(--font-body)",
@@ -79,13 +108,14 @@ const Chapter1 = () => {
                 color: "#6B7280",
                 maxWidth: 520,
               }}
+              {...fade(0.2, 0.5, 12)}
             >
               There's a quiet crisis in business today. Companies with decades of
               expertise — real, verified, hard-won capability — are invisible
               where it matters most.
-            </p>
+            </motion.p>
 
-            <ProblemAccordion items={accordionItems} defaultOpen={0} />
+            <ProblemAccordion items={accordionItems} defaultOpen={0} reducedMotion={reduced} />
           </div>
         </div>
       </div>
@@ -96,6 +126,7 @@ const Chapter1 = () => {
         closingLine1="The distance between what you are"
         closingLine2="and what the world sees."
         sectionNumber="01"
+        reducedMotion={reduced}
       />
     </section>
   );

@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useReducedMotion from "@/hooks/useReducedMotion";
 
@@ -7,16 +8,21 @@ interface ParallaxBreathProps {
   closingLine1: string;
   closingLine2: string;
   sectionNumber: string;
+  reducedMotion?: boolean;
 }
+
+const ease = [0.4, 0, 0.2, 1] as const;
 
 const ParallaxBreath = ({
   imageSrc,
   closingLine1,
   closingLine2,
   sectionNumber,
+  reducedMotion: reducedMotionProp,
 }: ParallaxBreathProps) => {
   const isMobile = useIsMobile();
-  const prefersReducedMotion = useReducedMotion();
+  const hookReduced = useReducedMotion();
+  const prefersReducedMotion = reducedMotionProp ?? hookReduced;
   const sectionRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -54,6 +60,26 @@ const ParallaxBreath = ({
     init();
     return () => ctx?.revert();
   }, [prefersReducedMotion]);
+
+  const fade = (delay: number, duration = 0.6, y = 16) =>
+    prefersReducedMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y } as const,
+          whileInView: { opacity: 1, y: 0 } as const,
+          viewport: { once: true, amount: 0.4 } as const,
+          transition: { duration, delay, ease },
+        };
+
+  const fadeOnly = (delay: number, duration = 0.5) =>
+    prefersReducedMotion
+      ? {}
+      : {
+          initial: { opacity: 0 } as const,
+          whileInView: { opacity: 1 } as const,
+          viewport: { once: true, amount: 0.4 } as const,
+          transition: { duration, delay, ease },
+        };
 
   return (
     <section
@@ -102,12 +128,16 @@ const ParallaxBreath = ({
           textShadow: "0 2px 20px rgba(0,0,0,0.3)",
         }}
       >
-        <span className="block">{closingLine1}</span>
-        <span className="block">{closingLine2}</span>
+        <motion.span className="block" {...fade(0, 0.6)}>
+          {closingLine1}
+        </motion.span>
+        <motion.span className="block" {...fade(0.2, 0.6)}>
+          {closingLine2}
+        </motion.span>
       </div>
 
       {/* Section number */}
-      <span
+      <motion.span
         className="absolute z-[2]"
         style={{
           top: isMobile ? 32 : 48,
@@ -118,9 +148,10 @@ const ParallaxBreath = ({
           color: "rgba(249, 250, 251, 0.35)",
           letterSpacing: "0.1em",
         }}
+        {...fadeOnly(0.1)}
       >
         {sectionNumber}
-      </span>
+      </motion.span>
     </section>
   );
 };
