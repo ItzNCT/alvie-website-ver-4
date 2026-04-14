@@ -131,11 +131,19 @@ const ScrollytellingUnified = () => {
     offset: ["start start", "end end"],
   });
 
-  const frameIndex = useTransform(scrollYProgress, [0, 1], [0, TOTAL_FRAMES - 1]);
+  // Map frames to first 600vh/400vh only (0→0.857 of 700vh, 0→0.8 of 500vh)
+  const frameRatio = isMobile ? 0.8 : 0.857;
+  const frameIndex = useTransform(scrollYProgress, [0, frameRatio], [0, TOTAL_FRAMES - 1]);
 
   /* ── Bottom content: scroll-driven ── */
   const bottomOpacity = useTransform(frameIndex, [0, 40, 60], [0, 0, 1], { clamp: true });
   const bottomY = useTransform(frameIndex, [0, 40, 60], [20, 20, 0], { clamp: true });
+
+  /* ── Linger zone: fade out text overlay during final 100vh ── */
+  const lingerFadeOpacity = useTransform(scrollYProgress, [frameRatio, 1.0], [1, 0], { clamp: true });
+
+  /* ── Bottom glow during last 50vh ── */
+  const glowOpacity = useTransform(scrollYProgress, [0.93, 1.0], [0, 1], { clamp: true });
 
   /* ── Draw frame on canvas ── */
   useMotionValueEvent(frameIndex, "change", (latest) => {
