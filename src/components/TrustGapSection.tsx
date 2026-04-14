@@ -38,7 +38,7 @@ const PARAGRAPHS = [
   "The good news: nothing about your actual work needs to change. Your expertise, your values, your track record—they're already there. They just need to be seen. What needs to change is how the digital world experiences who you really are.",
 ];
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 /* ── Stat Card 1: Glassmorphism over image ── */
 const StatFrame1 = () => {
