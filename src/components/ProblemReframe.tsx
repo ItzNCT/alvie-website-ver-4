@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import problemImage from "@/assets/problem-statement-image.webp";
 
 const stats = [
   {
@@ -30,10 +31,23 @@ const ProblemReframe = () => {
     offset: ["start end", "end end"],
   });
 
-  const y = useTransform(scrollYProgress, [0.5, 0.85], ["100vh", "0vh"]);
+  // Curtain slide up: adjusted for longer scroll
+  const y = useTransform(scrollYProgress, [0.22, 0.38], ["100vh", "0vh"]);
+
+  // Image reveal: dot → full-bleed
+  const imageScale = useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1]);
+  const imageWidth = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vw"]);
+  const imageHeight = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vh"]);
+  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.8], ["50%", "0%"]);
+
+  // Text fade-ins
+  const text1Opacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
+  const text1Y = useTransform(scrollYProgress, [0.8, 0.9], [20, 0]);
+  const text2Opacity = useTransform(scrollYProgress, [0.88, 0.95], [0, 1]);
+  const text2Y = useTransform(scrollYProgress, [0.88, 0.95], [20, 0]);
 
   return (
-    <section ref={containerRef} className="relative" style={{ height: "200vh", marginTop: "-100vh" }}>
+    <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
       <motion.div
         className="sticky top-0 w-screen h-screen overflow-hidden"
         style={{
@@ -42,6 +56,7 @@ const ProblemReframe = () => {
           background: "#F9FAFB",
         }}
       >
+        {/* Trust Gap content */}
         <div className="w-full h-full flex flex-col justify-center max-w-[1200px] mx-auto px-6">
           {/* Top row: Overline + Headline | Body text */}
           <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-8 md:gap-16 mb-16 md:mb-24">
@@ -145,6 +160,76 @@ const ProblemReframe = () => {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Image overlay — scales from dot to full-bleed */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ zIndex: 50 }}
+        >
+          <motion.div
+            className="relative overflow-hidden"
+            style={{
+              width: imageWidth,
+              height: imageHeight,
+              borderRadius: imageBorderRadius,
+              scale: imageScale,
+            }}
+          >
+            <img
+              src={problemImage}
+              alt="Rice field landscape representing the translation gap"
+              className="alvie-photo w-full h-full object-cover"
+            />
+            {/* Vignette overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)",
+              }}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* Text overlay */}
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ zIndex: 60 }}
+        >
+          <div className="text-center px-6" style={{ maxWidth: "640px" }}>
+            <motion.p
+              style={{
+                opacity: text1Opacity,
+                y: text1Y,
+                fontFamily: "var(--font-body)",
+                fontSize: "20px",
+                fontWeight: 300,
+                lineHeight: 1.8,
+                color: "#F9FAFB",
+              }}
+            >
+              The gap isn't about technology or capability. It's about
+              translation. Your real-world excellence has never been properly
+              translated into digital language.
+            </motion.p>
+
+            <motion.p
+              style={{
+                opacity: text2Opacity,
+                y: text2Y,
+                fontFamily: "var(--font-display)",
+                fontSize: "18px",
+                fontWeight: 700,
+                lineHeight: 1.6,
+                color: "#D49A5A",
+                letterSpacing: "0.02em",
+                marginTop: "32px",
+              }}
+            >
+              That's where we come in.
+            </motion.p>
           </div>
         </div>
       </motion.div>
