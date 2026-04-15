@@ -1,20 +1,51 @@
 
 
-## Plan: Move Image Reveal Origin Below the Stats
+## Plan: Fix Image Not Covering Full Screen
 
 ### Problem
-The image dot currently appears at the vertical center of the sticky viewport (`items-center justify-center`). It should start below the stats row — at the bottom area of the Trust Gap content — then expand to cover the full screen.
+The image container uses `flex items-end justify-center pb-16`, which keeps the image anchored at the bottom even at full-bleed size. A `100vw × 100vh` element inside a flex container with `pb-16` won't align to all edges — there's a gap at the bottom/top.
 
-### Technical Change
+### Solution
+Use absolute positioning with animated `bottom` instead of flex alignment. This way the image starts at the bottom and transitions to `inset: 0` (filling the entire viewport) as it grows.
 
-**File: `src/components/ProblemReframe.tsx`** (line 168)
+### Technical Changes
 
-Change the image overlay container from centered to bottom-aligned:
+**File: `src/components/ProblemReframe.tsx`**
 
-- From: `className="absolute inset-0 flex items-center justify-center pointer-events-none"`
-- To: `className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none"`
+1. **Remove flex alignment from the image wrapper** — change from `flex items-end justify-center pb-16` to just a positioning container.
 
-This positions the dot's origin just below the stats row. As it scales to `1` and dimensions grow to `100vw × 100vh`, it will naturally overtake the entire screen from that bottom position. The `pb-16` (64px) gives breathing room from the viewport edge.
+2. **Position the inner image element absolutely** with animated `bottom` and `left: 50%` / `translateX(-50%)` for horizontal centering initially, transitioning to `inset: 0` at full-bleed.
 
-One line change, one file.
+Simpler approach: keep the current container as `absolute inset-0` with no flex, and position the inner `motion.div` absolutely with:
+- `left: 50%`, `transform: translateX(-50%)` for horizontal centering
+- Animated `bottom`: `10%` → `0%`
+- At full size (`100vw × 100vh`), set `top: 0, left: 0, transform: none` so it fills the viewport completely
+
+**Revised transforms** (lines 37–41):
+```tsx
+const imageWidth = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vw"]);
+const imageHeight = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vh"]);
+const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["50%", "50%", "0%"]);
+const imageBottom = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["10%", "5%", "0%"]);
+const imageLeft = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["50%", "50%", "0%"]);
+const imageTranslateX = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["-50%", "-50%", "0%"]);
+```
+
+**Image container** (lines 167–178): Remove flex, use plain absolute container. Inner div gets:
+```tsx
+style={{
+  position: "absolute",
+  bottom: imageBottom,
+  left: imageLeft,
+  x: imageTranslateX,
+  width: imageWidth,
+  height: imageHeight,
+  borderRadius: imageBorderRadius,
+}}
+```
+
+Also remove the old `imageScale` transform (line 38) — it's no longer needed.
+
+### Result
+The circle starts as a small dot near the bottom, grows as a circle, morphs to square, and at full size covers the entire viewport edge-to-edge with no gaps.
 
