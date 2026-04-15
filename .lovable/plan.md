@@ -1,37 +1,28 @@
 
 
-## Plan: Auto-playing Image Reveal (No Scroll Scrubbing)
+## Plan: Fix Image Reveal — Reversible + Slower
 
-### Problem
-The image enlargement (circle → full-screen) currently requires the user to scroll through a long phase (0.55–0.8 of scrollYProgress). The user wants it to trigger once and play automatically — no scrubbing through phases.
-
-### Approach
-Use Framer Motion's `useInView` to detect when the image container enters the viewport. Once triggered, play a CSS/Framer animation that smoothly scales from a small circle to full-bleed over ~1.8s. The text fades in sequentially after the image finishes expanding.
+### Problems
+1. **Image covers Trust Gap permanently** — `useInView` uses `once: true`, so once triggered the image never shrinks back. When scrolling up, you see the full-bleed image instead of the Trust Gap stats.
+2. **Too fast** — 1.8s duration needs to be ~30% slower (2.4s).
 
 ### Changes to `src/components/ProblemReframe.tsx`
 
-**1. Remove scroll-driven image transforms**
-- Delete `imageScale`, `imageWidth`, `imageHeight`, `imageBorderRadius` (lines 38–41)
-- Delete scroll-driven `text1Opacity`, `text1Y`, `text2Opacity`, `text2Y` (lines 44–47)
+**1. Make the reveal reversible**
+- Remove `once: true` from `useInView` — change to `{ amount: 0.3 }` only
+- Remove the `useState`/`useEffect` pattern — drive animation directly from `isInView`
+- When user scrolls up past the trigger point, `isInView` becomes false → image shrinks back to circle → Trust Gap stats become visible again
 
-**2. Add state-driven animation**
-- Add `useState` for `revealed` boolean
-- Use `useInView` on the image container div — once it enters viewport, set `revealed = true`
-- Animate the image container with `motion.div` using `animate` prop:
-  - Initial: `{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }`
-  - Revealed: `{ width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }`
-  - Transition: `duration: 1.8, ease: [0.4, 0, 0.2, 1]`
+**2. Slow down the animation by 30%**
+- Image expand/shrink: `1.8s` → `2.4s`
+- Text 1 delay: `1.6s` → `2.1s`
+- Text 2 delay: `2.2s` → `2.9s`
 
-**3. Text fade-in after image**
-- Text 1: `animate` with `opacity: 1, y: 0` when revealed, `delay: 1.6`
-- Text 2: same but `delay: 2.2`
-- Both use `duration: 0.6` for a calm entrance
-
-**4. Reduce section height**
-- Since the image reveal no longer needs scroll distance, reduce section height from `450vh` to ~`300vh` (the curtain slide-up and Trust Gap stats still need scroll room, but the image phase is now automatic)
+**3. Text hides when image shrinks**
+- Text opacity animates based on `isInView` (same as image), so text fades out when scrolling back up
 
 ### Result
-When the user scrolls past the Trust Gap stats, the image circle appears and automatically expands to full-screen over ~1.8 seconds. Text fades in after. No scroll scrubbing needed for the reveal phase.
+Scrolling down past the stats triggers a slow 2.4s circle-to-fullscreen expansion. Scrolling back up reverses it — image shrinks, Trust Gap stats reappear. No content is permanently hidden.
 
 ### Files Changed
 1. `src/components/ProblemReframe.tsx`
