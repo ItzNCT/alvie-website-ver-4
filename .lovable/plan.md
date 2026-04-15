@@ -1,26 +1,20 @@
 
 
-## Plan: Fix Circle Shape and Size
+## Plan: Move Image Reveal Origin Below the Stats
 
-### Problems
-1. **Oval, not circle**: `imageHeight` starts at `"6vw"` but diverges to `"50vh"` in the second keyframe while width goes to `"50vw"`. Since `vw ≠ vh`, the shape becomes oval during growth. Need to keep width and height equal (both using `vw`) until the final full-bleed frame.
-2. **Too big**: `6vw` ≈ 86px on a 1440px screen — too large for a "small dot". Should start at `1vw` (~14px).
+### Problem
+The image dot currently appears at the vertical center of the sticky viewport (`items-center justify-center`). It should start below the stats row — at the bottom area of the Trust Gap content — then expand to cover the full screen.
 
 ### Technical Change
 
-**File: `src/components/ProblemReframe.tsx`** (lines 38–39)
+**File: `src/components/ProblemReframe.tsx`** (line 168)
 
-Replace the width/height transforms:
+Change the image overlay container from centered to bottom-aligned:
 
-```tsx
-const imageWidth = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vw"]);
-const imageHeight = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vh"]);
-```
+- From: `className="absolute inset-0 flex items-center justify-center pointer-events-none"`
+- To: `className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none"`
 
-Key changes:
-- Start size: `1vw` × `1vw` (a true small dot)
-- Mid size: `50vw` × `50vw` (equal dimensions = perfect circle, since borderRadius is still `50%`)
-- End size: `100vw` × `100vh` (full-bleed, borderRadius already goes to `0%` here)
+This positions the dot's origin just below the stats row. As it scales to `1` and dimensions grow to `100vw × 100vh`, it will naturally overtake the entire screen from that bottom position. The `pb-16` (64px) gives breathing room from the viewport edge.
 
-Two property values changed, one file.
+One line change, one file.
 
