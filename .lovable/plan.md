@@ -1,56 +1,51 @@
 
 
-## Plan: "The Translation Gap" — Cinematic Image Reveal Section
+## Plan: Image Overtakes Trust Gap (No Fade-Out)
 
-### Vision
-After the Trust Gap section finishes scrolling, a small centered image of the rice field appears and dramatically scales to fill the entire viewport — a cinematic "window opening" effect. Once the image is full-bleed, the translation text fades in over it, centered, calm, and unhurried.
+### Clarification
+The Trust Gap content should **not** fade out. Instead, the image grows from a small dot at the center of the Trust Gap canvas and visually covers/overtakes everything as it scales to full-bleed. The Trust Gap stays rendered underneath — the image simply layers on top.
+
+### Approach
+Merge the TranslationGap image + text directly into ProblemReframe's sticky viewport as an overlay layer. The image starts as a tiny dot (centered, high z-index) and scales up to cover the entire screen. No content fades out — it's purely a visual takeover.
 
 ### Scroll Choreography
 
 ```text
-Trust Gap section ends
-        │
-        ▼
-┌─────────────────────────┐
-│  Image starts small     │  ← ~20% viewport, centered, rounded
-│  at center of screen    │
-│                         │
-│  Scales to full-bleed   │  ← over ~200vh of scroll
-│  as user scrolls        │
-│                         │
-│  Once full-bleed:       │
-│  Text 1 fades in        │  ← "The gap isn't about..."
-│  Text 2 fades in        │  ← "That's where we come in."
-└─────────────────────────┘
+ProblemReframe (extend to 450vh)
+├── 0.22–0.38  Curtain slides up (adjusted from current 0.5–0.85)
+├── 0.38–0.55  Trust Gap content visible, static
+├── 0.55–0.80  Image dot appears at center, scales to full-bleed OVER the content
+├── 0.80–0.90  Text 1 fades in over image
+├── 0.88–0.95  Text 2 fades in over image
+└── 0.95–1.0   Hold
 ```
 
-### Technical Details
+### Technical Changes
 
-**New file: `src/components/TranslationGap.tsx`**
+**File: `src/components/ProblemReframe.tsx`**
 
-- Copy uploaded image to `src/assets/problem-statement-image.webp`
-- Section height: `400vh` for generous scroll range
-- Sticky inner viewport (`top-0, w-screen, h-screen`)
-- Uses `useScroll` + `useTransform` (Framer Motion) — consistent with existing pattern
-- Image scaling: scroll-driven from `scale(0.4)` + `borderRadius: 24px` → `scale(1)` + `borderRadius: 0` over frames 0–60%
-- Apply `.alvie-photo` filter class for cinematic consistency
-- Dark vignette overlay (radial gradient) over image for text readability
-- Text 1 (main body): fades in at 65–80% scroll progress, Be Vietnam Pro, 20px, light weight, `#F9FAFB`, max-width 640px, centered, line-height 1.8
-- Text 2 ("That's where we come in."): fades in at 78–90%, Baloo 2, bold, ALVIE gold color (`#D49A5A`), 18px, letter-spacing 0.02em — sophisticated, not shouting
-- Both texts use `opacity` + subtle `y` translate (20px → 0) for the fade-in
+1. Import `problemImage` from `@/assets/problem-statement-image.webp`
+2. Change section height from `200vh` to `450vh`
+3. Adjust curtain `y` transform: `[0.22, 0.38]` maps `["100vh", "0vh"]`
+4. Add inside the sticky viewport (after the content div, so it layers on top):
+   - A `motion.div` for the image with z-index 50
+   - `position: absolute; inset: 0; display: flex; align-items: center; justify-content: center`
+   - Image container scales: `useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1])` 
+   - Border radius: `useTransform([0.55, 0.8], ["50%", "0%"])`
+   - Width/height: `useTransform` from `"6vw"/"6vw"` to `"100vw"/"100vh"`
+   - Apply `.alvie-photo` filter class + radial vignette overlay
+5. Add text overlays (z-index 60, absolute centered):
+   - Text 1: opacity `[0.8, 0.9]`, y `[20, 0]`, Be Vietnam Pro, 20px, light, `#F9FAFB`
+   - Text 2: opacity `[0.88, 0.95]`, y `[20, 0]`, Baloo 2, bold, `#D49A5A`, 18px
 
 **File: `src/pages/Index.tsx`**
 
-- Import and add `<TranslationGap />` after `<ProblemReframe />`
+- Remove `TranslationGap` import and `<TranslationGap />` from JSX
 
-### Sizing & Layout
-- Image container: starts at `width: 50vw, height: 50vh` (centered), expands to `100vw × 100vh`
-- Text block: `max-width: 640px`, centered horizontally, positioned at vertical center
-- Text 1: 20px, font-weight 300 (light), line-height 1.8, color `#F9FAFB`
-- Text 2: 18px, font-weight 700 (bold), Baloo 2, color `#D49A5A`, margin-top 32px
+**File: `src/components/TranslationGap.tsx`**
 
-### Files Changed
-1. Copy `problem-statement-image.webp` → `src/assets/`
-2. Create `src/components/TranslationGap.tsx`
-3. Update `src/pages/Index.tsx` (add import + component)
+- Delete (merged into ProblemReframe)
+
+### Result
+Trust Gap content stays visible. A small circular dot appears at the center of the screen, grows cinematically to cover everything, then the translation text fades in over the full-bleed image. One continuous, immersive sequence.
 
