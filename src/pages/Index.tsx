@@ -1,6 +1,7 @@
 import HeroSection from "@/components/HeroSection";
 import ScrollytellingUnified from "@/components/ScrollytellingUnified";
 import ProblemReframe from "@/components/ProblemReframe";
+import TranslationGap from "@/components/TranslationGap";
 
 const Index = () => {
   return (
@@ -8,6 +9,7 @@ const Index = () => {
       <HeroSection />
       <ScrollytellingUnified />
       <ProblemReframe />
+      <TranslationGap />
     </div>
   );
 };
