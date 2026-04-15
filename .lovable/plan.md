@@ -1,34 +1,21 @@
 
 
-## Plan: Fix ProblemReframe Component Styling
+## Plan: Delay ProblemReframe Curtain Until Text 3 Finishes
 
-### Issues to Fix
+### Problem
+The ProblemReframe curtain slides in too early, overlapping with the third headline "Into a living digital presence" (frames 170–195). The curtain animation begins around frame ~166 due to the `-100vh` margin overlap.
 
-1. **Replace "--" with a visual line**: Change the text "The Reality ——" to show a small horizontal line (using a styled span with border-bottom or an inline-block element) instead of the em dash characters.
+### Solution
+Increase the scrollytelling section height to give more scroll runway, so the curtain only arrives after frame 195.
 
-2. **Fix first line hanging in body text**: The body paragraph has uneven text flow. Ensure text hangs correctly with proper wrapping and alignment.
+### Technical Change
 
-3. **Make stat descriptions 4 lines and centered**: The description text and references in the three stat columns should each occupy 4 lines total and be center-aligned.
+**File: `src/components/ScrollytellingUnified.tsx`**
+- Increase desktop section height from `600vh` to `800vh`. This stretches out the frame timing, giving Text 3 more real scroll distance to complete before ProblemReframe's curtain begins.
 
-4. **"The Trust Gap" headline**: Change from 42px to 64px and apply ALVIE green color (`#0F5C4E`).
+**File: `src/components/ProblemReframe.tsx`**
+- No changes needed. The `-100vh` overlap and `200vh` height remain the same — they just start later because the scrollytelling section is taller.
 
-5. **Stat numbers centered and green**: The 75%, 94%, 84% numbers should be center-aligned in their columns and use ALVIE green (`#0F5C4E`).
-
-6. **Fix third stat**: Change from 75% to 84% for the consumers trust statistic.
-
-### Changes in `src/components/ProblemReframe.tsx`
-
-**Line 4-22 (stats array)**: Change third stat number from "75" to "84".
-
-**Lines 51-60 (overline)**: Replace the "——" text with a styled span element showing a small horizontal line (e.g., `border-bottom: 1px solid #6B7280`, `width: 24px`, `display: inline-block`).
-
-**Line 62-74 (headline)**: Change fontSize from "42px" to "64px", color from "#111827" to "#0F5C4E".
-
-**Lines 78-96 (body text)**: Ensure proper text alignment and line height to prevent hanging issues.
-
-**Lines 99-141 (stat columns)**: 
-- Wrap each stat in a centered flex container
-- Change number color to "#0F5C4E"
-- Add `textAlign: "center"` to description and reference paragraphs
-- Ensure descriptions occupy exactly 4 lines with proper lineHeight
+### Why This Works
+With 800vh, frame 195 maps to ~97.5% × 800vh = 780vh scroll. The ProblemReframe curtain starts animating when its section top reaches the viewport bottom — that's at ~700vh (800vh - 200vh + 100vh overlap). Frame at 700vh = 700/800 × 199 ≈ frame 174. The curtain reaches `y: 0` at ~800vh = frame 199. So the curtain fully lands only after all text has appeared, creating a seamless handoff.
 

@@ -33,7 +33,7 @@ const ProblemReframe = () => {
   const y = useTransform(scrollYProgress, [0, 1], ["100vh", "0vh"]);
 
   return (
-    <section ref={containerRef} className="relative" style={{ height: "200vh" }}>
+    <section ref={containerRef} className="relative" style={{ height: "200vh", marginTop: "-100vh" }}>
       <motion.div
         className="sticky top-0 w-screen h-screen overflow-hidden"
         style={{
