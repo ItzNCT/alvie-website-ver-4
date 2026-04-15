@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import problemImage from "@/assets/problem-statement-image.webp";
 
 const stats = [
@@ -25,9 +25,7 @@ const stats = [
 
 const ProblemReframe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageTriggerRef = useRef<HTMLDivElement>(null);
-
-  const isInView = useInView(imageTriggerRef, { amount: 0.3 });
+  const [revealed, setRevealed] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -36,6 +34,16 @@ const ProblemReframe = () => {
 
   // Curtain slide up (kept scroll-driven)
   const y = useTransform(scrollYProgress, [0.15, 0.35], ["100vh", "0vh"]);
+
+  // Trigger reveal at ~60% scroll progress (after Trust Gap is fully readable)
+  // and reverse when scrolling back above that threshold
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (latest >= 0.6 && !revealed) {
+      setRevealed(true);
+    } else if (latest < 0.55 && revealed) {
+      setRevealed(false);
+    }
+  });
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "300vh", marginTop: "-100vh" }}>
@@ -154,9 +162,8 @@ const ProblemReframe = () => {
           </div>
         </div>
 
-        {/* Image trigger ref + auto-playing reveal */}
+        {/* Image reveal — triggered by scroll threshold, auto-playing */}
         <div
-          ref={imageTriggerRef}
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 50 }}
         >
@@ -164,7 +171,7 @@ const ProblemReframe = () => {
             className="relative overflow-hidden"
             initial={{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }}
             animate={
-              isInView
+              revealed
                 ? { width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }
                 : { width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }
             }
@@ -186,8 +193,8 @@ const ProblemReframe = () => {
           <div className="text-center px-6" style={{ maxWidth: "800px" }}>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 2.1, ease: [0.4, 0, 0.2, 1] }}
+              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: revealed ? 2.1 : 0, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "32px",
@@ -203,8 +210,8 @@ const ProblemReframe = () => {
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 2.9, ease: [0.4, 0, 0.2, 1] }}
+              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: revealed ? 2.9 : 0, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "32px",
