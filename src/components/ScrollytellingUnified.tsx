@@ -231,7 +231,7 @@ const ScrollytellingUnified = () => {
       id="section-introduction"
       ref={containerRef}
       className="relative"
-      style={{ height: isMobile ? "400vh" : "1500vh" }}
+      style={{ height: isMobile ? "400vh" : "1800vh" }}
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 w-screen h-screen overflow-hidden bg-black">
