@@ -43,7 +43,7 @@ const ProblemReframe = () => {
         }}
       >
         {/* Content container with safe-space padding */}
-        <div className="w-full h-full flex flex-col justify-center px-6 md:px-12">
+        <div className="w-full h-full flex flex-col justify-center max-w-[1200px] mx-auto px-6">
           {/* Top row: Overline + Headline | Body text */}
           <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-8 md:gap-16 mb-16 md:mb-24">
             {/* Left column */}
