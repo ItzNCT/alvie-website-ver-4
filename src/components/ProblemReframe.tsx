@@ -165,7 +165,7 @@ const ProblemReframe = () => {
 
         {/* Image overlay — scales from dot to full-bleed */}
         <motion.div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none"
           style={{ zIndex: 50 }}
         >
           <motion.div
