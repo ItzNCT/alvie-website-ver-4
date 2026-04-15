@@ -1,18 +1,32 @@
 
 
-## Plan: Fix Gap Between Scrollytelling and ProblemReframe
+## Plan: Delay ProblemReframe Curtain Until Text Finishes
 
 ### Problem
-When the scrollytelling section ends (its 600vh scroll space is exhausted), the ProblemReframe curtain hasn't yet slid up to cover the viewport. This exposes the bare page background as a visible gap.
+The ProblemReframe curtain starts sliding up at the same time as the third headline "Into a living digital presence" (frames 170–195). The -100vh margin overlap means the curtain begins moving at ~frame 166, before the text even starts appearing.
 
 ### Root Cause
-ProblemReframe's sticky div starts at `y: 100vh` (off-screen below) and slides to `y: 0`. The scroll offset `["start end", "start start"]` means the animation only begins when ProblemReframe's top enters the viewport bottom — but by then, the scrollytelling sticky viewport has already released, leaving an empty frame.
+The y transform maps the full scrollYProgress `[0, 1]` to `["100vh", "0vh"]`. With -100vh overlap, the curtain starts moving at scroll position 500vh (frame ~166), while the final text doesn't finish until frame 195 (scroll ~588vh).
 
 ### Fix
-Add `marginTop: -100vh` to the ProblemReframe section so it overlaps the tail end of the scrollytelling. This makes the curtain begin sliding up while the scrollytelling is still sticky, creating a seamless transition with no gap.
+Delay the curtain's y transform so it stays off-screen until the text is nearly done, then slides up quickly in the remaining scroll distance.
+
+Change the y mapping from:
+```
+[0, 1] → ["100vh", "0vh"]
+```
+to:
+```
+[0.85, 1] → ["100vh", "0vh"]
+```
+
+This keeps the curtain at `100vh` (hidden below) for 85% of the overlap scroll, only sliding up during the final 15vh — which corresponds to frames ~191+, after "Into a living digital presence" has mostly resolved.
 
 ### Technical Change
 
-**File: `src/components/ProblemReframe.tsx`**
-- On the outer `<section>`, add `marginTop: "-100vh"` to the existing style prop, keeping `height: "200vh"` unchanged.
+**File: `src/components/ProblemReframe.tsx`** (line 33)
+- Change: `useTransform(scrollYProgress, [0, 1], ["100vh", "0vh"])`
+- To: `useTransform(scrollYProgress, [0.85, 1], ["100vh", "0vh"])`
+
+Single line change. No other files affected.
 
