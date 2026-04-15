@@ -1,22 +1,29 @@
 
 
-## Plan: Fix Right Column Paragraph Alignment
+## Plan: Remove the Right-Side Gap in the Paragraph Column
 
 ### Problem
-The right column paragraph has `my-[50px]` which adds 50px vertical margin, causing it to appear "short" relative to the stats row below. The `flex items-start` on the wrapper also prevents proper vertical alignment with the headline on the left. On reload, the layout doesn't match the desired alignment where the paragraph bottom should sit level with the headline bottom, creating consistent spacing to the stats.
+The paragraph has `maxWidth: "540px"` but sits inside a grid column that's ~720px wide (3fr out of 5fr total in a 1200px container). This creates a ~180px empty gap on the right side.
 
 ### Fix
-Remove the `my-[50px]` margin from the paragraph and change the right column wrapper from `items-start` to `items-end`. This anchors the paragraph text to the bottom of the left column's headline, ensuring the gap to the stats row is consistent regardless of text reflow.
+Remove the `maxWidth: "540px"` constraint so the paragraph fills the full column width naturally. The grid column itself already constrains the width appropriately.
 
-### Technical Changes
+### Technical Change
 
-**File: `src/components/ProblemReframe.tsx`**
+**File: `src/components/ProblemReframe.tsx`** (lines 88–96)
 
-1. **Line 85** — Change right column div:
-   - From: `className="flex items-start"`
-   - To: `className="flex items-end"`
+Remove `maxWidth: "540px"` from the paragraph's inline style:
 
-2. **Line 87** — Remove vertical margin from paragraph:
-   - From: `className="md:pt-1 my-[50px] text-lg font-normal text-justify"`
-   - To: `className="text-lg font-normal text-justify"`
+```tsx
+style={{
+  fontFamily: "var(--font-body)",
+  fontSize: "18px",
+  fontWeight: 400,
+  lineHeight: "1.7",
+  color: "#6B7280",
+  textIndent: "2em",
+}}
+```
+
+Single property removal, one file.
 
