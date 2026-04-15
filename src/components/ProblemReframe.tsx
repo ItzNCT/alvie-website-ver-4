@@ -15,7 +15,7 @@ const stats = [
     reference: "(Forbes, 2023)",
   },
   {
-    number: "75",
+    number: "84",
     description:
       "of consumers trust a grounded, dedicated website far more than fleeting social media facades.",
     reference: "(Dicom Interactive)",
@@ -42,30 +42,37 @@ const ProblemReframe = () => {
           background: "#F9FAFB",
         }}
       >
-        {/* Content container with safe-space padding */}
         <div className="w-full h-full flex flex-col justify-center max-w-[1200px] mx-auto px-6">
           {/* Top row: Overline + Headline | Body text */}
           <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-8 md:gap-16 mb-16 md:mb-24">
             {/* Left column */}
             <div>
               <p
-                className="text-sm uppercase tracking-widest mb-6"
+                className="text-sm uppercase tracking-widest mb-6 flex items-center gap-3"
                 style={{
                   fontFamily: "var(--font-body)",
                   color: "#6B7280",
                   letterSpacing: "0.15em",
                 }}
               >
-                The Reality ——
+                The Reality
+                <span
+                  className="inline-block"
+                  style={{
+                    width: "24px",
+                    height: "1px",
+                    backgroundColor: "#6B7280",
+                  }}
+                />
               </p>
               <h2
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "42px",
+                  fontSize: "64px",
                   fontWeight: 700,
                   lineHeight: "110%",
                   letterSpacing: "-0.02em",
-                  color: "#111827",
+                  color: "#0F5C4E",
                 }}
               >
                 The Trust
@@ -85,6 +92,7 @@ const ProblemReframe = () => {
                   lineHeight: "1.7",
                   color: "#6B7280",
                   maxWidth: "540px",
+                  textIndent: "2em",
                 }}
               >
                 You've probably noticed this before. The hesitation to share
@@ -99,7 +107,7 @@ const ProblemReframe = () => {
           {/* Bottom row: Three stat columns */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {stats.map((stat, i) => (
-              <div key={i}>
+              <div key={i} className="text-center">
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
@@ -107,7 +115,7 @@ const ProblemReframe = () => {
                     fontWeight: 400,
                     lineHeight: "1",
                     letterSpacing: "-0.02em",
-                    color: "#111827",
+                    color: "#0F5C4E",
                   }}
                 >
                   {stat.number}
