@@ -35,16 +35,16 @@ const ProblemReframe = () => {
   const y = useTransform(scrollYProgress, [0.22, 0.38], ["100vh", "0vh"]);
 
   // Image reveal: dot → full-bleed
-  const imageScale = useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1]);
-  const imageWidth = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vw"]);
-  const imageHeight = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vh"]);
-  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.8], ["50%", "0%"]);
+  const imageScale = useTransform(scrollYProgress, [0.55, 0.68], [0.03, 1]);
+  const imageWidth = useTransform(scrollYProgress, [0.55, 0.68], ["6vw", "100vw"]);
+  const imageHeight = useTransform(scrollYProgress, [0.55, 0.68], ["6vw", "100vh"]);
+  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.68], ["50%", "0%"]);
 
   // Text fade-ins
-  const text1Opacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
-  const text1Y = useTransform(scrollYProgress, [0.8, 0.9], [20, 0]);
-  const text2Opacity = useTransform(scrollYProgress, [0.88, 0.95], [0, 1]);
-  const text2Y = useTransform(scrollYProgress, [0.88, 0.95], [20, 0]);
+  const text1Opacity = useTransform(scrollYProgress, [0.68, 0.78], [0, 1]);
+  const text1Y = useTransform(scrollYProgress, [0.68, 0.78], [20, 0]);
+  const text2Opacity = useTransform(scrollYProgress, [0.76, 0.84], [0, 1]);
+  const text2Y = useTransform(scrollYProgress, [0.76, 0.84], [20, 0]);
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
