@@ -186,8 +186,8 @@ const ProblemReframe = () => {
           <div className="text-center px-6" style={{ maxWidth: "800px" }}>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 1.6, ease: [0.4, 0, 0.2, 1] }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 2.1, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "32px",
@@ -203,8 +203,8 @@ const ProblemReframe = () => {
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 2.2, ease: [0.4, 0, 0.2, 1] }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 2.9, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "32px",
