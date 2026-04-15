@@ -164,11 +164,11 @@ const ProblemReframe = () => {
             className="relative overflow-hidden"
             initial={{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }}
             animate={
-              revealed
+              isInView
                 ? { width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }
                 : { width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }
             }
-            transition={{ duration: 1.8, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 2.4, ease: [0.4, 0, 0.2, 1] }}
           >
             <img
               src={problemImage}
