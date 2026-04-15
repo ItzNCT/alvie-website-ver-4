@@ -1,37 +1,30 @@
 
 
-## Plan: Auto-playing Image Reveal (No Scroll Scrubbing)
+## Plan: Fix Image Reveal Timing and Word-by-Word Text
 
-### Problem
-The image enlargement (circle → full-screen) currently requires the user to scroll through a long phase (0.55–0.8 of scrollYProgress). The user wants it to trigger once and play automatically — no scrubbing through phases.
+### Problem 1: Image reveals too early
+The `useInView` on `imageTriggerRef` fires immediately because the ref is an `absolute inset-0` div inside the sticky container — it's "in view" the moment the curtain finishes sliding up. The reveal should only trigger after the user scrolls past the Trust Gap stats.
 
-### Approach
-Use Framer Motion's `useInView` to detect when the image container enters the viewport. Once triggered, play a CSS/Framer animation that smoothly scales from a small circle to full-bleed over ~1.8s. The text fades in sequentially after the image finishes expanding.
+**Fix:** Replace `useInView` trigger with a `scrollYProgress` threshold check. When `scrollYProgress > 0.55` (meaning the user has scrolled well past the Trust Gap content), set `revealed = true`. This keeps the auto-play animation (no scrubbing) but delays the trigger to the right moment. The user can also scroll back to see the Trust Gap stats since the image won't cover them until that threshold.
+
+### Problem 2: Text appears all at once
+Both paragraphs fade in as single blocks. The user wants word-by-word reveal.
+
+**Fix:** Split each text string into individual words. Wrap each word in a `motion.span` with staggered delay. Text 1 starts after the image finishes expanding (~1.8s), each word appears ~80ms apart. Text 2 starts after Text 1 completes, same stagger.
 
 ### Changes to `src/components/ProblemReframe.tsx`
 
-**1. Remove scroll-driven image transforms**
-- Delete `imageScale`, `imageWidth`, `imageHeight`, `imageBorderRadius` (lines 38–41)
-- Delete scroll-driven `text1Opacity`, `text1Y`, `text2Opacity`, `text2Y` (lines 44–47)
-
-**2. Add state-driven animation**
-- Add `useState` for `revealed` boolean
-- Use `useInView` on the image container div — once it enters viewport, set `revealed = true`
-- Animate the image container with `motion.div` using `animate` prop:
-  - Initial: `{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }`
-  - Revealed: `{ width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }`
-  - Transition: `duration: 1.8, ease: [0.4, 0, 0.2, 1]`
-
-**3. Text fade-in after image**
-- Text 1: `animate` with `opacity: 1, y: 0` when revealed, `delay: 1.6`
-- Text 2: same but `delay: 2.2`
-- Both use `duration: 0.6` for a calm entrance
-
-**4. Reduce section height**
-- Since the image reveal no longer needs scroll distance, reduce section height from `450vh` to ~`300vh` (the curtain slide-up and Trust Gap stats still need scroll room, but the image phase is now automatic)
+1. **Remove `useInView`** — replace with `useMotionValueEvent` on `scrollYProgress` to set `revealed = true` when progress crosses 0.55
+2. **Remove `imageTriggerRef`** — no longer needed
+3. **Word-by-word text rendering** — create a helper that splits text into words and returns `motion.span` elements with staggered opacity/y animations
+   - Text 1 words: start at delay 1.8s, each word +80ms
+   - Text 2 words: start after Text 1 finishes (~1.8 + wordCount*0.08), each word +80ms
+4. Keep the image `motion.div` animation unchanged (1.8s auto-expand)
 
 ### Result
-When the user scrolls past the Trust Gap stats, the image circle appears and automatically expands to full-screen over ~1.8 seconds. Text fades in after. No scroll scrubbing needed for the reveal phase.
+- Image reveal waits until user scrolls past Trust Gap stats
+- Scrolling back shows Trust Gap content, not just the hero
+- Text appears word by word with a calm stagger after the image expands
 
 ### Files Changed
 1. `src/components/ProblemReframe.tsx`
