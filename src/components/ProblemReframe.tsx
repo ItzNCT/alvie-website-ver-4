@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import problemImage from "@/assets/problem-statement-image.webp";
 
@@ -26,13 +26,8 @@ const stats = [
 const ProblemReframe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageTriggerRef = useRef<HTMLDivElement>(null);
-  const [revealed, setRevealed] = useState(false);
 
-  const isInView = useInView(imageTriggerRef, { once: true, amount: 0.3 });
-
-  useEffect(() => {
-    if (isInView) setRevealed(true);
-  }, [isInView]);
+  const isInView = useInView(imageTriggerRef, { amount: 0.3 });
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -169,11 +164,11 @@ const ProblemReframe = () => {
             className="relative overflow-hidden"
             initial={{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }}
             animate={
-              revealed
+              isInView
                 ? { width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }
                 : { width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }
             }
-            transition={{ duration: 1.8, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 2.4, ease: [0.4, 0, 0.2, 1] }}
           >
             <img
               src={problemImage}
@@ -191,8 +186,8 @@ const ProblemReframe = () => {
           <div className="text-center px-6" style={{ maxWidth: "800px" }}>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 1.6, ease: [0.4, 0, 0.2, 1] }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 2.1, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "32px",
@@ -208,8 +203,8 @@ const ProblemReframe = () => {
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 2.2, ease: [0.4, 0, 0.2, 1] }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 2.9, ease: [0.4, 0, 0.2, 1] }}
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "32px",
