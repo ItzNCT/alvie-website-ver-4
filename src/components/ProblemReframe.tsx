@@ -180,14 +180,14 @@ const ProblemReframe = () => {
             <img
               src={problemImage}
               alt="Rice field landscape representing the translation gap"
-              className="alvie-photo w-full h-full object-cover"
+              className="alvie-photo-dark w-full h-full object-cover"
             />
             {/* Vignette overlay */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)",
+                  "radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%)",
               }}
             />
           </motion.div>
@@ -198,7 +198,7 @@ const ProblemReframe = () => {
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 60 }}
         >
-          <div className="text-center px-6" style={{ maxWidth: "640px" }}>
+          <div className="text-center px-6" style={{ maxWidth: "680px" }}>
             <motion.p
               style={{
                 opacity: text1Opacity,
@@ -220,12 +220,12 @@ const ProblemReframe = () => {
                 opacity: text2Opacity,
                 y: text2Y,
                 fontFamily: "var(--font-display)",
-                fontSize: "18px",
+                fontSize: "20px",
                 fontWeight: 700,
                 lineHeight: 1.6,
                 color: "#D49A5A",
                 letterSpacing: "0.02em",
-                marginTop: "32px",
+                marginTop: "40px",
               }}
             >
               That's where we come in.
