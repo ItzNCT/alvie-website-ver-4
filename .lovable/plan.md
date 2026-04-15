@@ -1,29 +1,38 @@
 
+Root cause: the reveal is currently tied to a full-screen absolute layer inside the sticky viewport, so it counts as “in view” too early. That makes the image expand as soon as the Problem section arrives, instead of only after the Trust Gap reading phase.
 
-## Plan: Fix Image Reveal — Reversible + Slower
+```text
+Hero/Scrollytelling -> Trust Gap stays readable -> Trigger point reached -> Image auto-expands
+Scroll back up past trigger -> Image auto-shrinks -> Trust Gap is readable again
+```
 
-### Problems
-1. **Image covers Trust Gap permanently** — `useInView` uses `once: true`, so once triggered the image never shrinks back. When scrolling up, you see the full-bleed image instead of the Trust Gap stats.
-2. **Too fast** — 1.8s duration needs to be ~30% slower (2.4s).
+### Plan
 
-### Changes to `src/components/ProblemReframe.tsx`
+1. Fix the trigger in `src/components/ProblemReframe.tsx`
+- Remove the current `useInView(imageTriggerRef)` logic for the image reveal.
+- Trigger the reveal from the section’s own `scrollYProgress` threshold instead.
+- Set that threshold after the Trust Gap has already settled on screen and had time to be read.
 
-**1. Make the reveal reversible**
-- Remove `once: true` from `useInView` — change to `{ amount: 0.3 }` only
-- Remove the `useState`/`useEffect` pattern — drive animation directly from `isInView`
-- When user scrolls up past the trigger point, `isInView` becomes false → image shrinks back to circle → Trust Gap stats become visible again
+2. Keep the reveal automatic, not scroll-scrubbed
+- Scroll will only start the animation.
+- The image will still enlarge from small circle to full screen on its own.
+- It will no longer be tied frame-by-frame to scroll position.
 
-**2. Slow down the animation by 30%**
-- Image expand/shrink: `1.8s` → `2.4s`
-- Text 1 delay: `1.6s` → `2.1s`
-- Text 2 delay: `2.2s` → `2.9s`
+3. Make the animation properly reversible
+- When scroll progress goes back above the Trust Gap zone, switch the reveal state back to false.
+- The image shrinks automatically to the small circle again.
+- The overlay text fades out before or alongside the shrink so the Trust Gap is visible again immediately.
 
-**3. Text hides when image shrinks**
-- Text opacity animates based on `isInView` (same as image), so text fades out when scrolling back up
+4. Preserve the calm pacing
+- Keep the slower timing already requested for the enlarge/shrink animation.
+- Match the text delays to the new reveal state so the sequence still feels unhurried.
 
-### Result
-Scrolling down past the stats triggers a slow 2.4s circle-to-fullscreen expansion. Scrolling back up reverses it — image shrinks, Trust Gap stats reappear. No content is permanently hidden.
+5. Limit changes to the problem section
+- Main file: `src/components/ProblemReframe.tsx`
+- Keep the curtain slide-up behavior intact unless the new threshold needs a tiny timing adjustment.
 
-### Files Changed
-1. `src/components/ProblemReframe.tsx`
-
+### Expected result
+- The Trust Gap appears first and remains accessible.
+- The fullscreen image takeover happens only after the Trust Gap section, not immediately.
+- Scrolling back up shrinks the image again and restores the Trust Gap view.
+- The whole effect stays reversible and calm.
