@@ -76,30 +76,29 @@ const ScrollWord = ({
   exitEnd?: number;
   staggerStep: number;
 }) => {
+  const hasExit = exitStart !== undefined && exitEnd !== undefined;
   const wordEnterStart = enterStart + index * staggerStep;
   const wordEnterEnd = Math.min(wordEnterStart + (enterEnd - enterStart) * 0.6, enterEnd);
 
+  const safeExitStart = exitStart ?? 9999;
+  const safeExitEnd = exitEnd ?? 10000;
+  const wordExitStart = safeExitStart + index * staggerStep;
+  const wordExitEnd = Math.min(wordExitStart + (safeExitEnd - safeExitStart) * 0.6, safeExitEnd);
+
   const enterOpacity = useTransform(frameIndex, [wordEnterStart, wordEnterEnd], [0, 1], { clamp: true });
   const enterY = useTransform(frameIndex, [wordEnterStart, wordEnterEnd], [40, 0], { clamp: true });
+  const exitOpacity = useTransform(frameIndex, [wordExitStart, wordExitEnd], [1, 0], { clamp: true });
+  const exitY = useTransform(frameIndex, [wordExitStart, wordExitEnd], [0, -40], { clamp: true });
 
-  let exitOpacity: ReturnType<typeof useTransform<number, number>> | undefined;
-  let exitY: ReturnType<typeof useTransform<number, number>> | undefined;
+  const combinedOpacity = useTransform(
+    [enterOpacity, exitOpacity] as any,
+    ([eIn, eOut]: number[]) => hasExit ? eIn * eOut : eIn
+  );
 
-  if (exitStart !== undefined && exitEnd !== undefined) {
-    const wordExitStart = exitStart + index * staggerStep;
-    const wordExitEnd = Math.min(wordExitStart + (exitEnd - exitStart) * 0.6, exitEnd);
-    exitOpacity = useTransform(frameIndex, [wordExitStart, wordExitEnd], [1, 0], { clamp: true });
-    exitY = useTransform(frameIndex, [wordExitStart, wordExitEnd], [0, -40], { clamp: true });
-  }
-
-  // Combine enter and exit: if we have exit transforms, multiply/add them
-  const combinedOpacity = exitOpacity
-    ? useTransform([enterOpacity, exitOpacity] as any, ([eIn, eOut]: number[]) => eIn * eOut)
-    : enterOpacity;
-
-  const combinedY = exitY
-    ? useTransform([enterY, exitY] as any, ([yIn, yOut]: number[]) => yIn + yOut)
-    : enterY;
+  const combinedY = useTransform(
+    [enterY, exitY] as any,
+    ([yIn, yOut]: number[]) => hasExit ? yIn + yOut : yIn
+  );
 
   return (
     <motion.span
