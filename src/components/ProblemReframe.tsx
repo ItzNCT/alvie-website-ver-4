@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import problemImage from "@/assets/problem-statement-image.webp";
 
@@ -26,13 +26,8 @@ const stats = [
 const ProblemReframe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageTriggerRef = useRef<HTMLDivElement>(null);
-  const [revealed, setRevealed] = useState(false);
 
-  const isInView = useInView(imageTriggerRef, { once: true, amount: 0.3 });
-
-  useEffect(() => {
-    if (isInView) setRevealed(true);
-  }, [isInView]);
+  const isInView = useInView(imageTriggerRef, { amount: 0.3 });
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
