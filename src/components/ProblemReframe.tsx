@@ -35,12 +35,10 @@ const ProblemReframe = () => {
   const y = useTransform(scrollYProgress, [0.22, 0.38], ["100vh", "0vh"]);
 
   // Image reveal: dot → full-bleed
-  const imageWidth = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vw"]);
-  const imageHeight = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["1vw", "50vw", "100vh"]);
-  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["50%", "50%", "0%"]);
-  const imageBottom = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["10%", "5%", "0%"]);
-  const imageLeft = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["50%", "50%", "0%"]);
-  const imageTranslateX = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["-50%", "-50%", "0%"]);
+  const imageScale = useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1]);
+  const imageWidth = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vw"]);
+  const imageHeight = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vh"]);
+  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.8], ["50%", "0%"]);
 
   // Text fade-ins
   const text1Opacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
@@ -166,20 +164,17 @@ const ProblemReframe = () => {
         </div>
 
         {/* Image overlay — scales from dot to full-bleed */}
-        <div
-          className="absolute inset-0 pointer-events-none"
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 50 }}
         >
           <motion.div
-            className="overflow-hidden"
+            className="relative overflow-hidden"
             style={{
-              position: "absolute",
-              bottom: imageBottom,
-              left: imageLeft,
-              x: imageTranslateX,
               width: imageWidth,
               height: imageHeight,
               borderRadius: imageBorderRadius,
+              scale: imageScale,
             }}
           >
             <img
@@ -196,7 +191,7 @@ const ProblemReframe = () => {
               }}
             />
           </motion.div>
-        </div>
+        </motion.div>
 
         {/* Text overlay */}
         <div
