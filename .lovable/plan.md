@@ -1,19 +1,20 @@
 
 
-## Plan: Bump Both Texts to 32px
+## Plan: Speed Up Image Expansion
+
+Compress the scroll ranges so the image reveal happens faster, reducing how much the user needs to scroll through the image-growing phase.
 
 ### Changes to `src/components/ProblemReframe.tsx`
 
-**Text 1** ("The gap isn't about technology..."):
-- `fontSize`: `"20px"` → `"32px"`
-- `lineHeight`: `1.8` → `1.5`
+**Image reveal** — shrink the range from `[0.55, 0.8]` to `[0.55, 0.68]`:
+- `imageScale`: `[0.55, 0.68]`
+- `imageWidth`: `[0.55, 0.68]`
+- `imageHeight`: `[0.55, 0.68]`
+- `imageBorderRadius`: `[0.55, 0.68]`
 
-**Text 2** ("That's where we come in."):
-- `fontSize`: `"20px"` → `"32px"`
-- `marginTop`: `"40px"` → `"48px"` for breathing room
+**Text fade-ins** — shift earlier to match:
+- `text1Opacity` / `text1Y`: `[0.68, 0.78]`
+- `text2Opacity` / `text2Y`: `[0.76, 0.84]`
 
-**Container**: Increase `maxWidth` from `"680px"` to `"800px"` to fit larger text comfortably.
-
-### Result
-Both text layers become 32px with proper spacing to avoid overlap.
+This cuts the image expansion scroll distance nearly in half while keeping the same start point and smooth progression.
 
