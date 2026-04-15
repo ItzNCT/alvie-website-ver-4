@@ -182,14 +182,6 @@ const ProblemReframe = () => {
               alt="Rice field landscape representing the translation gap"
               className="alvie-photo-dark w-full h-full object-cover"
             />
-            {/* Vignette overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%)",
-              }}
-            />
           </motion.div>
         </motion.div>
 
