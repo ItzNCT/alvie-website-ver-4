@@ -91,7 +91,6 @@ const ProblemReframe = () => {
                   fontWeight: 400,
                   lineHeight: "1.7",
                   color: "#6B7280",
-                  maxWidth: "540px",
                   textIndent: "2em",
                 }}
               >
