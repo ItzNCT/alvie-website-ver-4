@@ -84,7 +84,7 @@ const ProblemReframe = () => {
             {/* Right column */}
             <div className="flex items-start">
               <p
-                className="md:pt-1"
+                className="md:pt-1 my-[50px] text-justify"
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "18px",
