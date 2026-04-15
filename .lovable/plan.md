@@ -1,41 +1,18 @@
 
 
-## Plan: Fix Translation Gap Text Size and Image Treatment
+## Plan: Make Image Much Darker (80% Black Overlay)
 
-### Changes to `src/components/ProblemReframe.tsx`
+The user wants 20% transparency — meaning you can only see 20% of the image through an 80% black overlay. The current setup uses `brightness(0.8)` (only 20% darker) plus a light vignette. That's far too subtle.
 
-**1. Text sizing — increase "That's where we come in." to 20px and add spacing**
+### Changes
 
-- Change Text 2 (`fontSize`) from `18px` to `20px`
-- Both texts are already 20px / will be 20px — ensure `marginTop: 40px` between them to prevent overlap
-- Increase `maxWidth` from `640px` to `680px` for breathing room
+**File: `src/index.css`** — Update `.alvie-photo-dark` filter
+- Change `brightness(0.8)` to `brightness(0.3)` to significantly darken the base image
 
-**2. Image filter — replace `.alvie-photo` with a new darker treatment**
+**File: `src/components/ProblemReframe.tsx`** — Update vignette overlay
+- Change the radial gradient from `rgba(0,0,0,0.05)` center / `rgba(0,0,0,0.6)` edges to `rgba(0,0,0,0.6)` center / `rgba(0,0,0,0.85)` edges
+- This combines with the darkened image filter to achieve roughly 80% black coverage while keeping the vignette (corners even darker)
 
-- Remove the `alvie-photo` class from the `<img>` tag
-- Apply a new class `alvie-photo-dark` instead — this will have 20% darker treatment (brightness 0.8) with slight desaturation
-- Keep the existing vignette overlay (radial gradient) but make it more subtle at center so the darkening layer handles the mood
-
-### Changes to `src/index.css`
-
-**3. Add new `.alvie-photo-dark` filter class**
-
-```css
-.alvie-photo-dark {
-  filter: brightness(0.8) saturate(0.9) contrast(1.08) sepia(0.05);
-  transition: filter 300ms ease;
-}
-```
-
-This creates a 20% darker image that keeps detail visible while making white/light text pop. Separate from `.alvie-photo` so the hero treatment stays untouched.
-
-**4. Vignette adjustment**
-
-Update the vignette overlay gradient to use a more transparent center (the darkness now comes from the filter itself):
-- Center: `rgba(0,0,0,0.05)` (nearly clear — let image show)
-- Edges: `rgba(0,0,0,0.6)` (soft corner blur/vignette)
-
-### Files Changed
-1. `src/components/ProblemReframe.tsx` — text size, class swap, vignette values
-2. `src/index.css` — add `.alvie-photo-dark` class
+### Result
+The image will be dramatically darker — only 20% of the original brightness visible — making the white and gold text pop significantly more. The vignette adds extra depth at corners.
 
