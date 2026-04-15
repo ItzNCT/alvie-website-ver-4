@@ -27,10 +27,10 @@ const ProblemReframe = () => {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "start start"],
+    offset: ["start end", "end end"],
   });
 
-  const y = useTransform(scrollYProgress, [0.65, 1], ["100vh", "0vh"]);
+  const y = useTransform(scrollYProgress, [0.5, 0.85], ["100vh", "0vh"]);
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "200vh", marginTop: "-100vh" }}>
