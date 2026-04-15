@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import problemImage from "@/assets/problem-statement-image.webp";
 
 const stats = [
@@ -23,16 +23,47 @@ const stats = [
   },
 ];
 
+const text1 = "The gap isn't about technology or capability. It's about translation. Your real-world excellence has never been properly translated into digital language.";
+const text2 = "That's where we come in.";
+
+const WordReveal = ({
+  text,
+  revealed,
+  startDelay,
+  wordInterval = 0.08,
+  style,
+}: {
+  text: string;
+  revealed: boolean;
+  startDelay: number;
+  wordInterval?: number;
+  style?: React.CSSProperties;
+}) => {
+  const words = text.split(" ");
+  return (
+    <p style={style}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          className="inline-block"
+          initial={{ opacity: 0, y: 12 }}
+          animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{
+            duration: 0.4,
+            delay: startDelay + i * wordInterval,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        >
+          {word}&nbsp;
+        </motion.span>
+      ))}
+    </p>
+  );
+};
+
 const ProblemReframe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageTriggerRef = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(false);
-
-  const isInView = useInView(imageTriggerRef, { once: true, amount: 0.3 });
-
-  useEffect(() => {
-    if (isInView) setRevealed(true);
-  }, [isInView]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -41,6 +72,16 @@ const ProblemReframe = () => {
 
   // Curtain slide up (kept scroll-driven)
   const y = useTransform(scrollYProgress, [0.15, 0.35], ["100vh", "0vh"]);
+
+  // Trigger image reveal at scroll threshold
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (latest > 0.55 && !revealed) {
+      setRevealed(true);
+    }
+  });
+
+  const text1WordCount = text1.split(" ").length;
+  const text2StartDelay = 1.8 + text1WordCount * 0.08 + 0.3;
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "300vh", marginTop: "-100vh" }}>
@@ -159,9 +200,8 @@ const ProblemReframe = () => {
           </div>
         </div>
 
-        {/* Image trigger ref + auto-playing reveal */}
+        {/* Auto-playing image reveal */}
         <div
-          ref={imageTriggerRef}
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 50 }}
         >
@@ -183,16 +223,16 @@ const ProblemReframe = () => {
           </motion.div>
         </div>
 
-        {/* Text overlay — fades in after image reveal */}
+        {/* Text overlay — word-by-word after image reveal */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 60 }}
         >
           <div className="text-center px-6" style={{ maxWidth: "800px" }}>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 1.6, ease: [0.4, 0, 0.2, 1] }}
+            <WordReveal
+              text={text1}
+              revealed={revealed}
+              startDelay={1.8}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "32px",
@@ -200,16 +240,12 @@ const ProblemReframe = () => {
                 lineHeight: 1.5,
                 color: "#F9FAFB",
               }}
-            >
-              The gap isn't about technology or capability. It's about
-              translation. Your real-world excellence has never been properly
-              translated into digital language.
-            </motion.p>
+            />
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 2.2, ease: [0.4, 0, 0.2, 1] }}
+            <WordReveal
+              text={text2}
+              revealed={revealed}
+              startDelay={text2StartDelay}
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "32px",
@@ -219,9 +255,7 @@ const ProblemReframe = () => {
                 letterSpacing: "0.02em",
                 marginTop: "48px",
               }}
-            >
-              That's where we come in.
-            </motion.p>
+            />
           </div>
         </div>
       </motion.div>
