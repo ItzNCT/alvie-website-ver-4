@@ -34,11 +34,12 @@ const ProblemReframe = () => {
   // Curtain slide up: adjusted for longer scroll
   const y = useTransform(scrollYProgress, [0.22, 0.38], ["100vh", "0vh"]);
 
-  // Image reveal: dot → full-bleed
-  const imageScale = useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1]);
-  const imageWidth = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vw"]);
-  const imageHeight = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vh"]);
-  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.8], ["50%", "0%"]);
+  // Image reveal: circle below stats → larger circle → square → full-bleed
+  const imageWidth = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["6vw", "50vw", "100vw"]);
+  const imageHeight = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["6vw", "50vh", "100vh"]);
+  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["50%", "50%", "0%"]);
+  // Shift origin from bottom to center as image grows
+  const imageBottom = useTransform(scrollYProgress, [0.55, 0.65, 0.78], ["10%", "5%", "0%"]);
 
   // Text fade-ins
   const text1Opacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
