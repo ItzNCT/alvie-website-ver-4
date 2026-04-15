@@ -190,15 +190,15 @@ const ProblemReframe = () => {
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 60 }}
         >
-          <div className="text-center px-6" style={{ maxWidth: "680px" }}>
+          <div className="text-center px-6" style={{ maxWidth: "800px" }}>
             <motion.p
               style={{
                 opacity: text1Opacity,
                 y: text1Y,
                 fontFamily: "var(--font-body)",
-                fontSize: "20px",
+                fontSize: "32px",
                 fontWeight: 300,
-                lineHeight: 1.8,
+                lineHeight: 1.5,
                 color: "#F9FAFB",
               }}
             >
@@ -212,12 +212,12 @@ const ProblemReframe = () => {
                 opacity: text2Opacity,
                 y: text2Y,
                 fontFamily: "var(--font-display)",
-                fontSize: "20px",
+                fontSize: "32px",
                 fontWeight: 700,
-                lineHeight: 1.6,
+                lineHeight: 1.5,
                 color: "#D49A5A",
                 letterSpacing: "0.02em",
-                marginTop: "40px",
+                marginTop: "48px",
               }}
             >
               That's where we come in.
