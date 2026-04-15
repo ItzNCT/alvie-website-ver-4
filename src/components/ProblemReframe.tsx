@@ -164,10 +164,10 @@ const ProblemReframe = () => {
           </div>
         </div>
 
-        {/* Image overlay — scales from dot to full-bleed */}
+        {/* Image overlay — circle from bottom, morphs to full-bleed */}
         <motion.div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ zIndex: 50 }}
+          className="absolute left-0 right-0 flex justify-center pointer-events-none"
+          style={{ zIndex: 50, bottom: imageBottom }}
         >
           <motion.div
             className="relative overflow-hidden"
@@ -175,7 +175,6 @@ const ProblemReframe = () => {
               width: imageWidth,
               height: imageHeight,
               borderRadius: imageBorderRadius,
-              scale: imageScale,
             }}
           >
             <img
