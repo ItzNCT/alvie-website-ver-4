@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import problemImage from "@/assets/problem-statement-image.webp";
 
 const stats = [
@@ -25,28 +25,29 @@ const stats = [
 
 const ProblemReframe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [revealed, setRevealed] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end end"],
   });
 
-  // Curtain slide up (kept scroll-driven)
-  const y = useTransform(scrollYProgress, [0.15, 0.35], ["100vh", "0vh"]);
+  // Curtain slide up: adjusted for longer scroll
+  const y = useTransform(scrollYProgress, [0.22, 0.38], ["100vh", "0vh"]);
 
-  // Trigger reveal at ~60% scroll progress (after Trust Gap is fully readable)
-  // and reverse when scrolling back above that threshold
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (latest >= 0.6 && !revealed) {
-      setRevealed(true);
-    } else if (latest < 0.55 && revealed) {
-      setRevealed(false);
-    }
-  });
+  // Image reveal: dot → full-bleed
+  const imageScale = useTransform(scrollYProgress, [0.55, 0.8], [0.03, 1]);
+  const imageWidth = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vw"]);
+  const imageHeight = useTransform(scrollYProgress, [0.55, 0.8], ["6vw", "100vh"]);
+  const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.8], ["50%", "0%"]);
+
+  // Text fade-ins
+  const text1Opacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
+  const text1Y = useTransform(scrollYProgress, [0.8, 0.9], [20, 0]);
+  const text2Opacity = useTransform(scrollYProgress, [0.88, 0.95], [0, 1]);
+  const text2Y = useTransform(scrollYProgress, [0.88, 0.95], [20, 0]);
 
   return (
-    <section ref={containerRef} className="relative" style={{ height: "300vh", marginTop: "-100vh" }}>
+    <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
       <motion.div
         className="sticky top-0 w-screen h-screen overflow-hidden"
         style={{
@@ -162,20 +163,19 @@ const ProblemReframe = () => {
           </div>
         </div>
 
-        {/* Image reveal — triggered by scroll threshold, auto-playing */}
-        <div
+        {/* Image overlay — scales from dot to full-bleed */}
+        <motion.div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 50 }}
         >
           <motion.div
             className="relative overflow-hidden"
-            initial={{ width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }}
-            animate={
-              revealed
-                ? { width: "100vw", height: "100vh", borderRadius: "0%", scale: 1 }
-                : { width: "6vw", height: "6vw", borderRadius: "50%", scale: 0.03 }
-            }
-            transition={{ duration: 2.4, ease: [0.4, 0, 0.2, 1] }}
+            style={{
+              width: imageWidth,
+              height: imageHeight,
+              borderRadius: imageBorderRadius,
+              scale: imageScale,
+            }}
           >
             <img
               src={problemImage}
@@ -183,19 +183,18 @@ const ProblemReframe = () => {
               className="alvie-photo-dark w-full h-full object-cover"
             />
           </motion.div>
-        </div>
+        </motion.div>
 
-        {/* Text overlay — fades in after image reveal */}
+        {/* Text overlay */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 60 }}
         >
           <div className="text-center px-6" style={{ maxWidth: "800px" }}>
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: revealed ? 2.1 : 0, ease: [0.4, 0, 0.2, 1] }}
               style={{
+                opacity: text1Opacity,
+                y: text1Y,
                 fontFamily: "var(--font-body)",
                 fontSize: "32px",
                 fontWeight: 300,
@@ -209,10 +208,9 @@ const ProblemReframe = () => {
             </motion.p>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: revealed ? 2.9 : 0, ease: [0.4, 0, 0.2, 1] }}
               style={{
+                opacity: text2Opacity,
+                y: text2Y,
                 fontFamily: "var(--font-display)",
                 fontSize: "32px",
                 fontWeight: 700,
