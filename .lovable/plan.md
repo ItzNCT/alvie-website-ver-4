@@ -1,30 +1,20 @@
 
 
-## Problem: Gap Between Hero and Scrollytelling
+## Plan: Speed Up Image Expansion
 
-The gap visible in your screenshot is caused by **`App.css`** — the default Vite boilerplate styles on `#root`:
+Compress the scroll ranges so the image reveal happens faster, reducing how much the user needs to scroll through the image-growing phase.
 
-```css
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;  /* ← This creates the gap */
-}
-```
+### Changes to `src/components/ProblemReframe.tsx`
 
-This `padding: 2rem` pushes all content inward, and `max-width: 1280px` constrains the full-bleed layout. These are Vite defaults that should have been removed for a full-screen cinematic site.
+**Image reveal** — shrink the range from `[0.55, 0.8]` to `[0.55, 0.68]`:
+- `imageScale`: `[0.55, 0.68]`
+- `imageWidth`: `[0.55, 0.68]`
+- `imageHeight`: `[0.55, 0.68]`
+- `imageBorderRadius`: `[0.55, 0.68]`
 
-### Fix
+**Text fade-ins** — shift earlier to match:
+- `text1Opacity` / `text1Y`: `[0.68, 0.78]`
+- `text2Opacity` / `text2Y`: `[0.76, 0.84]`
 
-**`src/App.css`** — Remove or override the `#root` block. Replace lines 1-6 with:
-
-```css
-#root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-```
-
-This removes the padding and max-width constraint, letting the hero, scrollytelling, and all sections flow edge-to-edge as intended. No other files need changes.
+This cuts the image expansion scroll distance nearly in half while keeping the same start point and smooth progression.
 
