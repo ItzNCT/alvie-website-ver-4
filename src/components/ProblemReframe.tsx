@@ -56,7 +56,7 @@ const ProblemReframe = () => {
   const text2Opacity = useTransform(() => text2FadeIn.get() * text2FadeOut.get());
 
   // Black overlay
-  const blackOverlayOpacity = useTransform(scrollYProgress, [0.88, 0.96], [0, 1]);
+  const blackOverlayOpacity = useTransform(scrollYProgress, [0.88, 1.0], [0, 1]);
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
@@ -201,7 +201,7 @@ const ProblemReframe = () => {
           className="absolute inset-0"
           style={{
             zIndex: 55,
-            backgroundColor: "#000000",
+            backgroundColor: "#121212",
             opacity: blackOverlayOpacity,
             pointerEvents: "none",
           }}
