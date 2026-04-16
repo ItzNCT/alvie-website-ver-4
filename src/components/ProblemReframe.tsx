@@ -41,10 +41,22 @@ const ProblemReframe = () => {
   const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.68], ["50%", "0%"]);
 
   // Text fade-ins
-  const text1Opacity = useTransform(scrollYProgress, [0.68, 0.78], [0, 1]);
+  // Text fade-ins
+  const text1FadeIn = useTransform(scrollYProgress, [0.68, 0.78], [0, 1]);
   const text1Y = useTransform(scrollYProgress, [0.68, 0.78], [20, 0]);
-  const text2Opacity = useTransform(scrollYProgress, [0.76, 0.84], [0, 1]);
+  const text2FadeIn = useTransform(scrollYProgress, [0.76, 0.84], [0, 1]);
   const text2Y = useTransform(scrollYProgress, [0.76, 0.84], [20, 0]);
+
+  // Text fade-outs
+  const text1FadeOut = useTransform(scrollYProgress, [0.84, 0.90], [1, 0]);
+  const text2FadeOut = useTransform(scrollYProgress, [0.84, 0.88], [1, 0]);
+
+  // Combined opacities (enter × exit)
+  const text1Opacity = useTransform(() => text1FadeIn.get() * text1FadeOut.get());
+  const text2Opacity = useTransform(() => text2FadeIn.get() * text2FadeOut.get());
+
+  // Black overlay
+  const blackOverlayOpacity = useTransform(scrollYProgress, [0.88, 0.96], [0, 1]);
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
@@ -182,7 +194,18 @@ const ProblemReframe = () => {
               alt="Rice field landscape representing the translation gap"
               className="alvie-photo-dark w-full h-full object-cover"
             />
-          </motion.div>
+        </motion.div>
+
+        {/* Black overlay — darkens to solid black */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            zIndex: 55,
+            backgroundColor: "#000000",
+            opacity: blackOverlayOpacity,
+            pointerEvents: "none",
+          }}
+        />
         </motion.div>
 
         {/* Text overlay */}
