@@ -66,7 +66,7 @@ const ProductSection = () => {
     >
       {/* Top 50vh — Header + Tabs */}
       <div
-        className="flex flex-col items-center justify-center"
+        className="flex flex-col items-center"
         style={{ height: "40vh" }}
       >
         {/* Overline */}
@@ -87,7 +87,7 @@ const ProductSection = () => {
         <h2
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "42px",
+            fontSize: "56px",
             fontWeight: 700,
             color: "#F9FAFB",
             textAlign: "center",
