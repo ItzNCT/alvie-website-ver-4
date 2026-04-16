@@ -194,7 +194,18 @@ const ProblemReframe = () => {
               alt="Rice field landscape representing the translation gap"
               className="alvie-photo-dark w-full h-full object-cover"
             />
-          </motion.div>
+        </motion.div>
+
+        {/* Black overlay — darkens to solid black */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            zIndex: 55,
+            backgroundColor: "#000000",
+            opacity: blackOverlayOpacity,
+            pointerEvents: "none",
+          }}
+        />
         </motion.div>
 
         {/* Text overlay */}
