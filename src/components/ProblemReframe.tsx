@@ -41,13 +41,16 @@ const ProblemReframe = () => {
   const imageBorderRadius = useTransform(scrollYProgress, [0.55, 0.68], ["50%", "0%"]);
 
   // Text fade-ins
-  const text1Opacity = useTransform(scrollYProgress, [0.68, 0.78], [0, 1]);
+  const text1Opacity = useTransform(scrollYProgress, [0.68, 0.78, 0.84, 0.90], [0, 1, 1, 0]);
   const text1Y = useTransform(scrollYProgress, [0.68, 0.78], [20, 0]);
-  const text2Opacity = useTransform(scrollYProgress, [0.76, 0.84], [0, 1]);
+  const text2Opacity = useTransform(scrollYProgress, [0.76, 0.84, 0.84, 0.90], [0, 1, 1, 0]);
   const text2Y = useTransform(scrollYProgress, [0.76, 0.84], [20, 0]);
 
+  // Black overlay for seamless transition to next section
+  const blackOverlayOpacity = useTransform(scrollYProgress, [0.90, 0.98], [0, 1]);
+
   return (
-    <section ref={containerRef} className="relative" style={{ height: "450vh", marginTop: "-100vh" }}>
+    <section ref={containerRef} className="relative" style={{ height: "550vh", marginTop: "-100vh" }}>
       <motion.div
         className="sticky top-0 w-screen h-screen overflow-hidden"
         style={{
@@ -224,6 +227,11 @@ const ProblemReframe = () => {
             </motion.p>
           </div>
         </div>
+        {/* Black overlay — fades to pure black for next section handoff */}
+        <motion.div
+          className="absolute inset-0"
+          style={{ zIndex: 70, backgroundColor: "#000", opacity: blackOverlayOpacity }}
+        />
       </motion.div>
     </section>
   );
