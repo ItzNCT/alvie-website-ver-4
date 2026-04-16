@@ -66,45 +66,47 @@ const ProductSection = () => {
     >
       {/* Top 50vh — Header + Tabs */}
       <div
-        className="flex flex-col items-center justify-center"
+        className="flex flex-col items-center"
         style={{ height: "40vh" }}
       >
-        {/* Overline */}
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "16px",
-            color: "#9CA3AF",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            marginBottom: "24px",
-          }}
-        >
-          Our Solutions
-        </p>
+        {/* Headline area — centered vertically */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          {/* Overline */}
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "16px",
+              color: "#9CA3AF",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              marginBottom: "24px",
+            }}
+          >
+            Our Solutions
+          </p>
 
-        {/* Headline */}
-        <h2
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "42px",
-            fontWeight: 700,
-            color: "#F9FAFB",
-            textAlign: "center",
-            letterSpacing: "-0.02em",
-            lineHeight: "115%",
-            marginBottom: "32px",
-          }}
-        >
-          For Your True Expertise
-          <br />
-          To Be Seen
-        </h2>
+          {/* Headline */}
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "56px",
+              fontWeight: 700,
+              color: "#F9FAFB",
+              textAlign: "center",
+              letterSpacing: "-0.02em",
+              lineHeight: "115%",
+            }}
+          >
+            For Your True Expertise
+            <br />
+            To Be Seen
+          </h2>
+        </div>
 
-        {/* Tab Bar */}
+        {/* Tab Bar — pinned near bottom, close to gallery */}
         <div
           className="flex items-center justify-center"
-          style={{ maxWidth: "1200px", gap: "48px" }}
+          style={{ maxWidth: "1200px", gap: "48px", paddingBottom: "16px" }}
         >
           {TABS.map((tab, i) => (
             <button
