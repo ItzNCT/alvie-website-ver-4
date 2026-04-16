@@ -67,13 +67,13 @@ const ProductSection = () => {
       {/* Top 50vh — Header + Tabs */}
       <div
         className="flex flex-col items-center justify-center"
-        style={{ height: "50vh" }}
+        style={{ height: "40vh" }}
       >
         {/* Overline */}
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "20px",
+            fontSize: "16px",
             color: "#9CA3AF",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -87,7 +87,7 @@ const ProductSection = () => {
         <h2
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "36px",
+            fontSize: "42px",
             fontWeight: 700,
             color: "#F9FAFB",
             textAlign: "center",
@@ -117,7 +117,6 @@ const ProductSection = () => {
                 color: activeTab === i ? "#F9FAFB" : "#6B7280",
                 background: "none",
                 border: "none",
-                borderBottom: activeTab === i ? "2px solid #4EB5A3" : "2px solid transparent",
                 paddingBottom: "8px",
                 cursor: "pointer",
                 transition: "color 300ms, border-color 300ms",
@@ -133,7 +132,7 @@ const ProductSection = () => {
       <div
         className="flex"
         style={{
-          height: "50vh",
+          height: "60vh",
           gap: "2px",
         }}
       >
@@ -179,20 +178,22 @@ const ProductSection = () => {
               {label}
             </span>
 
-            {/* Bottom-right CTA */}
-            <span
-              className="absolute flex items-center"
-              style={{
-                bottom: "48px",
-                right: "48px",
-                fontFamily: "var(--font-body)",
-                fontSize: "28px",
-                color: "#F9FAFB",
-                gap: "8px",
-              }}
-            >
-              Explore <ArrowRight size={28} />
-            </span>
+            {/* Bottom-right CTA — only on selected */}
+            {selectedImage === i && (
+              <span
+                className="absolute flex items-center"
+                style={{
+                  bottom: "48px",
+                  right: "48px",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "28px",
+                  color: "#F9FAFB",
+                  gap: "8px",
+                }}
+              >
+                Explore <ArrowRight size={28} />
+              </span>
+            )}
           </motion.div>
         ))}
       </div>
