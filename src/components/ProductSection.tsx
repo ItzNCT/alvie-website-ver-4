@@ -152,8 +152,10 @@ const ProductSection = () => {
 
   return (
     <section
-      className="relative flex flex-col"
+      className="flex flex-col"
       style={{
+        position: "sticky",
+        top: 0,
         zIndex: 45,
         background: "#121212",
         height: "100vh",
