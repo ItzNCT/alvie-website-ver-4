@@ -3,7 +3,7 @@ name: Proof Grid Featured Gallery
 description: Cinematic dark gallery — 5 tiles, hover spawns cursor-pinned 9:16 video card with rAF-lerp trailing
 type: feature
 ---
-Layout: header strip (lowercase "gallery" / "observe our work →", 14px Be Vietnam Pro, normal case, 24px below) + Row1 full-width + Row2 60/40 + Row3 40/60. Each row 100vh. Universal 48px spacing: section padding 48px, intra-row gap 48px, row-to-row 48px. Bg #121212. Z-index 50 (slides up over sticky ProductSection).
+Layout: header strip (lowercase "gallery" / "observe our work →", 14px Be Vietnam Pro, normal case, 24px below) + Row1 full-width + Row2 60/40 + Row3 40/60. Each row 100vh. Universal 16px spacing: section padding 16px, intra-row gap 16px, row-to-row 16px (header→row1 stays 24px). Bg #121212. Z-index 50 (slides up over sticky ProductSection).
 
 Tile composition (no underlying image transform — image is static):
 1. <img> base (Unsplash, static)
