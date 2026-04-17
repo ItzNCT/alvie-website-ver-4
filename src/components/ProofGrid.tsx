@@ -311,6 +311,8 @@ const ProofGrid = () => {
         zIndex: 50,
         background: "#121212",
         padding: "16px",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
       {/* Header strip — coupled to gallery (24px below) */}
