@@ -1,118 +1,107 @@
 
 
-## Plan: Featured Gallery Section — Cinematic Hover Reveals
+## Plan: Fix Featured Gallery — Cursor-Pinned Video Reveal
 
-Replace the current placeholder ProofGrid with a full cinematic featured gallery. Five proof tiles arranged across three full-viewport rows. Dark, immersive, hover-driven storytelling.
+Five focused fixes. The hard part is #2 (cursor-following video portal), so it gets the most detail.
 
-### Layout (top to bottom)
+---
 
-```
-┌─────────────────────────────────────────────────┐
-│ Gallery                       Observe our work →│  ← Header strip (compact, ~80px tall)
-├─────────────────────────────────────────────────┤
-│                                                 │
-│              [Tile 1 — Full width]              │  ← Row 1: 100vh
-│                                                 │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│      [Tile 2 — 60%]      [Tile 3 — 40%]        │  ← Row 2: 100vh
-│                                                 │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│      [Tile 4 — 40%]      [Tile 5 — 60%]        │  ← Row 3: 100vh
-│                                                 │
-└─────────────────────────────────────────────────┘
-```
+### Fix 1 — Header treatment
 
-- Background: solid `#121212` everywhere
-- Safe space: 48px from all screen edges (matches `--safe-space`)
-- Gap between tiles in the same row: 24px
-- Gap between rows: 48px
+- Remove `text-transform: uppercase` and `letter-spacing: 0.1em` from both labels.
+- Change copy: "Gallery" → "gallery", "Observe our work →" → "observe our work →".
+- Reduce vertical gap between header and Row 1 from `48px` to `24px` (visually groups the label with the gallery below it instead of floating).
+- Keep 48px horizontal safe space on both edges.
+- Typography: Be Vietnam Pro 14px, weight 400, normal case.
 
-### Header strip
+---
 
-- Height: ~80px, vertically centered content
-- Left (48px from screen edge): "Gallery" — Be Vietnam Pro, 16px, weight 500, color `#9CA3AF`, letter-spacing 0.1em, uppercase
-- Right (48px from screen edge): "Observe our work →" — same typography, color `#F9FAFB`, ghost-link hover (arrow translates +4px on hover)
+### Fix 2 — Cursor-pinned 9:16 video reveal (the hard one)
 
-### Per-tile composition (identical for all 5 tiles)
+**Concept:** Hovering a tile does NOT animate the underlying image. Instead, a small 9:16 portrait video appears **floating at the cursor position** and follows the mouse as it moves inside the tile. Like a magnifying glass that plays a clip.
 
-Each tile is a `border-radius: 24px; overflow: hidden;` container holding stacked layers (bottom → top):
+**Mechanics:**
 
 ```
-1. <img>      stock photo (always visible, base layer)
-2. <video>    stock mp4/gif loop, opacity 0 by default → 1 on hover
-              transform follows cursor with parallax (~12px range)
-3. ALVIE dark filter overlay   — rgba(15, 92, 78, 0.25) tinted dark veil
-                                 fades OUT on hover (so video pops)
-4. Vignette overlay            — radial-gradient transparent center → 
-                                 rgba(0,0,0,0.6) edges, ALWAYS on top
-5. Bottom-left caption block   — project name + category, fades up on hover
+Tile (image stays static, gets darker on hover)
+   └── Floating video card (position: absolute, follows cursor)
+        - Size: 240px wide × 427px tall (9:16 ratio)
+        - border-radius: 16px
+        - subtle shadow: 0 24px 60px rgba(0,0,0,0.5)
+        - transform: translate(cursorX - 120px, cursorY - 213px)
+        - opacity: 0 → 1 on enter (200ms)
+        - smoothed via requestAnimationFrame lerp (factor ~0.18) — 
+          lags slightly behind cursor for elegant "trailing" feel
 ```
 
-### Hover interaction (the key moment)
+**Implementation details per tile:**
 
-On `mouseenter`:
-- Video starts playing, fades in (300ms)
-- Dark ALVIE filter fades from 0.55 → 0.15 opacity (300ms)
-- Caption slides up 8px and brightens
-- Cursor tracking begins
+- State: `hovered: boolean`, `cursorPos: {x, y}` (raw, updated on mousemove), `smoothedPos: {x, y}` (lerped, used for transform).
+- `useEffect` runs a `requestAnimationFrame` loop while `hovered === true`:
+  ```
+  smoothedPos.x += (cursorPos.x - smoothedPos.x) * 0.18
+  smoothedPos.y += (cursorPos.y - smoothedPos.y) * 0.18
+  ```
+  Loop cancels on mouseleave.
+- The video card is `pointer-events: none` so it doesn't break hover state.
+- Edge clamping: clamp the smoothed position so the video card never overflows the tile bounds (keeps it visually contained).
+- On mouseenter: `video.play()`, fade card in.
+- On mouseleave: `video.pause()`, `video.currentTime = 0`, fade card out (200ms).
 
-On `mousemove` inside tile:
-- Calculate cursor position relative to tile center (-1 to +1 on each axis)
-- Apply `transform: translate3d(x * -12px, y * -12px, 0) scale(1.04)` to the video layer
-- Smooth via `transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1)`
-- Creates parallax — video subtly follows cursor, ~24px max range, scaled slightly so edges never reveal
+**Reduced motion fallback:** Skip the smoothing — video appears centered in the tile, fades in/out only.
 
-On `mouseleave`:
-- Video pauses, fades out
-- Dark filter restores
-- Video transform resets to center
-- Caption settles back
+**Touch fallback:** No floating card. Instead, fade the video to fill the whole tile (current IntersectionObserver autoplay behavior, simplified).
 
-### Stock media (5 tiles)
+---
 
-Use Unsplash for images (`https://images.unsplash.com/...`) and free hosted stock loops (e.g. Pexels/Coverr CDN URLs) for video. I'll source 5 cohesive cinematic clips — moody studio/workspace/hands-on-craft footage to match the Observer aesthetic.
+### Fix 3 — Invert filter logic
 
-Each tile gets:
-- `image`: cinematic still
-- `video`: 4-8s muted loop (.mp4)
-- `title`: project name
-- `category`: e.g. "Brand System · 2024"
+- Default state: ALVIE dark filter at **opacity 0.35** (image visible, slightly tinted).
+- Hover state: ALVIE dark filter at **opacity 0.75** (image darkens, drawing focus to the floating video card).
+- Same gradient, just swap the opacity values (`0.55 → 0.15` becomes `0.35 → 0.75`).
+- Vignette layer: unchanged, always on top.
 
-### Vignette + ALVIE filter specs
+---
 
-- Vignette: `radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.65) 100%)` — always 100% opacity, sits topmost (below caption)
-- ALVIE dark filter: solid layer with `background: linear-gradient(180deg, rgba(8,47,40,0.55) 0%, rgba(18,18,18,0.7) 100%)`, `mix-blend-mode: multiply` — opacity 0.55 default, 0.15 on hover
+### Fix 4 — Equal vertical & horizontal safe space
 
-### Accessibility & performance
+Currently:
+- Horizontal safe space: 48px
+- Vertical row gap: 48px
+- Intra-row gap: 24px
+- Section padding: 96px top/bottom
 
-- Respect `prefers-reduced-motion`: disable cursor parallax, fade only
-- Videos: `muted`, `playsInline`, `preload="metadata"`, `loop` — only `play()` on hover (saves bandwidth)
-- Touch devices: no hover state — show video autoplay-on-scroll-into-view as fallback (use IntersectionObserver)
+Change to:
+- Horizontal safe space: 48px (unchanged)
+- **Vertical row gap: 48px** (already matches)
+- **Intra-row gap: 48px** (was 24px — bump to match horizontal)
+- **Section padding: 48px top/bottom** (was 96px — match horizontal)
+- Header-to-row1 gap: 24px (per Fix 1)
 
-### Total section height
+Result: every gap between visual elements equals 48px, except the tighter header coupling.
 
-- Header: 80px
-- Row 1: 100vh
-- Row 2: 100vh  
-- Row 3: 100vh
-- Plus row gaps (48px × 2) + outer padding (96px top/bottom)
-- ≈ 300vh + ~270px
+---
 
-Sticky cover transition from ProductSection (already in place at z:50) is preserved — this gallery slides up over the pinned Solutions section as designed.
+### Fix 5 — Stock video sources (replace broken Coverr URLs)
+
+The current Coverr URLs in `ProofGrid.tsx` look fabricated/may 404. Swap to verified Pexels CDN 9:16 vertical videos (free, hot-linkable). I'll source 5 cinematic vertical clips: studio hands, pour shot, fabric texture, walking through forest, fog/landscape — matching the Observer aesthetic.
+
+---
 
 ### Files changed
 
-1. `src/components/ProofGrid.tsx` — full rewrite: header strip + 3 rows + 5 `GalleryTile` instances. Internal `GalleryTile` sub-component handles hover state, cursor tracking, video play/pause, parallax transform.
-2. `mem://features/proof-grid` — NEW memory file documenting the gallery structure, hover mechanic, and stock asset sources.
+1. `src/components/ProofGrid.tsx` — rewrite `GalleryTile`:
+   - Add cursor-following floating video card with rAF-smoothed lerp
+   - Invert filter opacity logic
+   - Replace video URLs
+   - Adjust header copy + spacing
+   - Bump intra-row gap and section padding to 48px
+2. `mem://features/proof-grid` — update spec: cursor-pinned 9:16 portal mechanic, inverted filter logic, 48px universal spacing.
 
 ### What is NOT touched
 
-- Hero, Scrollytelling, ProblemReframe, ProductSection, Index.tsx layering, sticky cover transition — all preserved.
-- ProofGrid's z-index (50), background (#121212 now instead of #F9FAFB — switching to dark per spec), and sticky cover behavior remain.
-
-### Open question (will ask after approval if needed)
-
-Caption content for the 5 tiles — for now I'll use evocative placeholder titles ("Quiet Atelier", "Hinoki Group", "Northbound Labs", "Solène Wellness", "Verdant Co."). Easy to swap later.
+- Hero, Scrollytelling, ProblemReframe, ProductSection — untouched.
+- Z-index 50 sticky cover transition — preserved.
+- Tile layout (full / 60-40 / 40-60) — preserved.
+- Captions and project names — preserved.
 
