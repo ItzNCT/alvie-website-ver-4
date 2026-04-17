@@ -1,18 +1,29 @@
 
+## Plan: Add Vignette Filter to Product Gallery Images
 
-## Plan: Fix Product Section — Headline Size + Tab Positioning
+Apply a cinematic vignette to all 16 images in the Product section, matching the immersive treatment used in the Hero.
 
-Two changes in `src/components/ProductSection.tsx`. Nothing else touched.
+### Approach
 
-### Changes
+Wrap each image with a vignette overlay — a radial gradient `div` layered above the `<img>` but below the existing bottom gradient + text. This keeps the existing bottom-text gradient and "Explore" CTA fully readable while adding cinematic edge darkening.
 
-1. **Headline font size**: `42px` → `56px` (line 90)
+### Vignette spec (matches Hero cinematic feel)
 
-2. **Move tab bar out of the top header block and closer to the image gallery**: Currently the tabs sit inside the 40vh header with `justify-center`, making them visually grouped with the headline. Fix by restructuring the layout:
-   - Change the top header from `justify-center` to `justify-center` but remove the tab bar from it
-   - Place the tab bar in its own container between the header and gallery, with a small `marginBottom` (e.g. 16px) above the images — so it reads as a label for the gallery below, not a footer of the headline above
-   - Practically: split the current 40vh block into two parts — the headline area (flex-grow, centered) and the tab bar pinned near the bottom of the top section with padding-bottom of ~16px before the images
+- Pure CSS radial gradient overlay, no extra assets
+- `background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)`
+- `mix-blend-mode: multiply` for natural darkening that respects underlying image tones
+- `pointer-events: none` so clicks still register on the image
+- Sits absolutely positioned, full inset, below the bottom gradient overlay in z-order
+
+### Layer order inside each image panel (bottom → top)
+1. `<img>` — the photo
+2. **NEW**: Vignette radial overlay
+3. Existing bottom-to-top black gradient (text legibility)
+4. Bottom-left label
+5. Bottom-right "Explore →" (selected only)
 
 ### Files changed
-1. `src/components/ProductSection.tsx` — font size update + tab repositioning
+- `src/components/ProductSection.tsx` — add one `<div>` per image panel inside the existing `motion.div` map (lines ~155–200)
 
+### What is NOT touched
+- Layout, typography, tab logic, 40/60 split, `ProblemReframe` darken transition, image URLs — all unchanged
