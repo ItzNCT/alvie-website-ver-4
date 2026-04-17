@@ -20,3 +20,4 @@ Layout constraint: No vertical navigation sidebar (removed, do not re-add).
 - [Torn Edge Effect](mem://ui/torn-edge-component) — Reusable section boundary overlap (-78px magic number)
 - [Problem Reframe](mem://features/problem-reframe) — Z-40 sliding curtain covering scrollytelling canvas
 - [Proof Grid Gallery](mem://features/proof-grid) — Cinematic 5-tile featured gallery with hover video + cursor parallax
+- [Philosophy Section](mem://features/philosophy-section) — Dark editorial sticky-headline + 3 staggered pillars
