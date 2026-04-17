@@ -155,6 +155,16 @@ const ProductSection = () => {
               loading="lazy"
             />
 
+            {/* Cinematic vignette overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)",
+                mixBlendMode: "multiply",
+              }}
+            />
+
             {/* Bottom gradient overlay */}
             <div
               className="absolute inset-0"
