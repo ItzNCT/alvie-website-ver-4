@@ -3,6 +3,7 @@ import ScrollytellingUnified from "@/components/ScrollytellingUnified";
 import ProblemReframe from "@/components/ProblemReframe";
 import ProductSection from "@/components/ProductSection";
 import ProofGrid from "@/components/ProofGrid";
+import PhilosophySection from "@/components/PhilosophySection";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <ProblemReframe />
       <ProductSection />
       <ProofGrid />
+      <PhilosophySection />
     </div>
   );
 };
