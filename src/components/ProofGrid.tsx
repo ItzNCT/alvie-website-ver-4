@@ -311,6 +311,8 @@ const ProofGrid = () => {
         zIndex: 50,
         background: "#121212",
         padding: "16px",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
       {/* Header strip — coupled to gallery (24px below) */}
@@ -360,7 +362,7 @@ const ProofGrid = () => {
       </div>
 
       {/* Row 1: full width */}
-      <div style={{ height: "100vh", display: "flex", marginBottom: "16px" }}>
+      <div style={{ height: "100vh", display: "flex", width: "100%", marginBottom: "16px" }}>
         <GalleryTile tile={TILES[0]} flex={1} />
       </div>
 
@@ -369,6 +371,7 @@ const ProofGrid = () => {
         style={{
           height: "100vh",
           display: "flex",
+          width: "100%",
           gap: "16px",
           marginBottom: "16px",
         }}
@@ -378,7 +381,7 @@ const ProofGrid = () => {
       </div>
 
       {/* Row 3: 40 / 60 */}
-      <div style={{ height: "100vh", display: "flex", gap: "16px" }}>
+      <div style={{ height: "100vh", display: "flex", width: "100%", gap: "16px" }}>
         <GalleryTile tile={TILES[3]} flex={4} />
         <GalleryTile tile={TILES[4]} flex={6} />
       </div>
